@@ -60,8 +60,10 @@ func processFile(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		fatal(err)
 	}
+	ast.Print(fset, f)
 	// find all interfaces in file
 	parseDecls(f.Decls)
+
 	// generate spy implementations
 	fi, err := os.Create("spy_test.go")
 	if err != nil {
@@ -105,8 +107,16 @@ func parseType(expr ast.Expr) {
 	switch t := expr.(type) {
 	case *ast.InterfaceType:
 		fmt.Println("found an interface", t)
+		parseMethods(t.Methods)
 	default:
 		// do nothing
+	}
+}
+
+func parseMethods(f *ast.FieldList) {
+	fmt.Println("found a field list", f)
+	for _, f := range f.List {
+		fmt.Println("found some names", f.Names)
 	}
 }
 

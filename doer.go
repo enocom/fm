@@ -2,9 +2,6 @@
 package main
 
 type Doer interface {
-	DoIt() int
-}
-
-type Fooer interface {
-	Foo() int
+	DoIt(task string, repeat bool) (int, error)
+	DoItAgain(task, prefix string) (count int, err error)
 }
