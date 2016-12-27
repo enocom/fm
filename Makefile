@@ -1,6 +1,5 @@
 test: clean
-	go install
-	go generate
+	bin/test
 
 clean:
 	rm -f spy_test.go

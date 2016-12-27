@@ -7,46 +7,28 @@ import (
 	"go/printer"
 	"go/token"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
 func main() {
-	dir, err := os.Getwd()
+	fset := token.NewFileSet()
+	pkgs, err := parser.ParseDir(fset, ".", isValidFile, 0)
 	if err != nil {
 		fatal(err)
 	}
-	if err := filepath.Walk(dir, processFile); err != nil {
-		fatal(err)
+
+	for _, ast := range pkgs {
+		for _, f := range ast.Files {
+			processFile(fset, f)
+		}
 	}
 }
 
 func isValidFile(info os.FileInfo) bool {
-	// temporary
-	if info.Name() == "main.go" {
-		return false
-	}
-
-	if info.IsDir() {
-		return false
-	}
-
-	return strings.HasSuffix(info.Name(), ".go") &&
-		!strings.HasSuffix(info.Name(), "_test.go")
+	return !strings.HasSuffix(info.Name(), "_test.go")
 }
 
-func processFile(path string, info os.FileInfo, err error) error {
-	if !isValidFile(info) {
-		return nil
-	}
-
-	// create ast from file
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, info.Name(), nil, 0)
-	if err != nil {
-		fatal(err)
-	}
-
+func processFile(fset *token.FileSet, f *ast.File) {
 	var decls []ast.Decl
 	for _, d := range f.Decls {
 		genDecl, ok := d.(*ast.GenDecl)
@@ -70,7 +52,7 @@ func processFile(path string, info os.FileInfo, err error) error {
 	}
 	f.Decls = decls
 
-	return printer.Fprint(os.Stdout, fset, f)
+	printer.Fprint(os.Stdout, fset, f)
 }
 
 func fatal(err error) {

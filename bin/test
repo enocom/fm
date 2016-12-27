@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+go install
+pushd example/ > /dev/null
+go generate
+popd > /dev/null
