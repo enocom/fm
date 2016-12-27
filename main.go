@@ -12,7 +12,7 @@ import (
 
 func main() {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, ".", isValidFile, 0)
+	pkgs, err := parser.ParseDir(fset, ".", isSrcFile, 0)
 	if err != nil {
 		fatal(err)
 	}
@@ -24,7 +24,7 @@ func main() {
 	}
 }
 
-func isValidFile(info os.FileInfo) bool {
+func isSrcFile(info os.FileInfo) bool {
 	return !strings.HasSuffix(info.Name(), "_test.go")
 }
 
