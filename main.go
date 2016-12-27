@@ -63,14 +63,23 @@ func processFile(path string, info os.FileInfo, err error) error {
 
 	var decls []ast.Decl
 	for _, d := range f.Decls {
-		if g, ok := d.(*ast.GenDecl); ok {
-			for _, s := range g.Specs {
-				if ts, ok := s.(*ast.TypeSpec); ok {
-					if _, ok := ts.Type.(*ast.InterfaceType); ok {
-						decls = append(decls, d)
-					}
-				}
+		genDecl, ok := d.(*ast.GenDecl)
+		if !ok {
+			continue
+		}
+
+		for _, spec := range genDecl.Specs {
+			typeSpec, ok := spec.(*ast.TypeSpec)
+
+			if !ok {
+				continue
 			}
+
+			if _, ok := typeSpec.Type.(*ast.InterfaceType); !ok {
+				continue
+			}
+
+			decls = append(decls, d)
 		}
 	}
 	f.Decls = decls
