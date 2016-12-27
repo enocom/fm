@@ -6,8 +6,6 @@ import (
 	"go/parser"
 	"go/printer"
 	"go/token"
-	"html/template"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,34 +21,22 @@ func main() {
 	}
 }
 
-func isValidFile(fname string) bool {
-	return strings.HasSuffix(fname, ".go") &&
-		!strings.HasSuffix(fname, "_test.go")
-}
-
-var fakeTemplate string = `package {{.Pname}}_test
-
-type Fake{{.Iname}} struct {}
-`
-
-var t = template.Must(template.New("fake_template").Parse(fakeTemplate))
-
-type Bindings struct {
-	Pname string
-	Iname string
-}
-
-func processFile(path string, info os.FileInfo, err error) error {
+func isValidFile(info os.FileInfo) bool {
 	// temporary
 	if info.Name() == "main.go" {
-		return nil
+		return false
 	}
 
 	if info.IsDir() {
-		return nil
+		return false
 	}
 
-	if !isValidFile(info.Name()) {
+	return strings.HasSuffix(info.Name(), ".go") &&
+		!strings.HasSuffix(info.Name(), "_test.go")
+}
+
+func processFile(path string, info os.FileInfo, err error) error {
+	if !isValidFile(info) {
 		return nil
 	}
 
@@ -84,12 +70,7 @@ func processFile(path string, info os.FileInfo, err error) error {
 	}
 	f.Decls = decls
 
-	err = printer.Fprint(os.Stdout, fset, f)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return printer.Fprint(os.Stdout, fset, f)
 }
 
 func fatal(err error) {
