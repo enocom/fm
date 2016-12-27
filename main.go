@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"html/template"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -52,72 +54,33 @@ func processFile(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	fmt.Println("Processing -->", path)
-
 	// create ast from file
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, info.Name(), nil, 0)
 	if err != nil {
 		fatal(err)
 	}
-	ast.Print(fset, f)
-	// find all interfaces in file
-	parseDecls(f.Decls)
 
-	// generate spy implementations
-	fi, err := os.Create("spy_test.go")
-	if err != nil {
-		fatal(err)
+	var decls []ast.Decl
+	for _, d := range f.Decls {
+		if g, ok := d.(*ast.GenDecl); ok {
+			for _, s := range g.Specs {
+				if ts, ok := s.(*ast.TypeSpec); ok {
+					if _, ok := ts.Type.(*ast.InterfaceType); ok {
+						decls = append(decls, d)
+					}
+				}
+			}
+		}
 	}
+	f.Decls = decls
 
-	// render bindings to template
-	data := Bindings{Pname: f.Name.Name, Iname: "Foobar"}
-	if err = t.Execute(fi, data); err != nil {
-		fatal(err)
+	err = printer.Fprint(os.Stdout, fset, f)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return nil
-}
-
-func parseDecls(decls []ast.Decl) {
-	for _, decl := range decls {
-		switch d := decl.(type) {
-		case *ast.GenDecl:
-			parseInterfaces(d)
-		default:
-			// do nothing
-		}
-	}
-
-}
-
-func parseInterfaces(d *ast.GenDecl) {
-	for _, spec := range d.Specs {
-		switch s := spec.(type) {
-		case *ast.TypeSpec:
-			fmt.Println("found a spec", s.Name)
-			parseType(s.Type)
-		default:
-			// do nothing
-		}
-	}
-}
-
-func parseType(expr ast.Expr) {
-	switch t := expr.(type) {
-	case *ast.InterfaceType:
-		fmt.Println("found an interface", t)
-		parseMethods(t.Methods)
-	default:
-		// do nothing
-	}
-}
-
-func parseMethods(f *ast.FieldList) {
-	fmt.Println("found a field list", f)
-	for _, f := range f.List {
-		fmt.Println("found some names", f.Names)
-	}
 }
 
 func fatal(err error) {
