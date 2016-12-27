@@ -19,7 +19,9 @@ func main() {
 
 	for _, ast := range pkgs {
 		for _, f := range ast.Files {
-			processFile(fset, f)
+			decls := findInterfaces(f.Decls)
+			f.Decls = decls
+			printer.Fprint(os.Stdout, fset, f)
 		}
 	}
 }
@@ -28,9 +30,9 @@ func isSrcFile(info os.FileInfo) bool {
 	return !strings.HasSuffix(info.Name(), "_test.go")
 }
 
-func processFile(fset *token.FileSet, f *ast.File) {
+func findInterfaces(ds []ast.Decl) []ast.Decl {
 	var decls []ast.Decl
-	for _, d := range f.Decls {
+	for _, d := range ds {
 		genDecl, ok := d.(*ast.GenDecl)
 		if !ok {
 			continue
@@ -50,9 +52,7 @@ func processFile(fset *token.FileSet, f *ast.File) {
 			decls = append(decls, d)
 		}
 	}
-	f.Decls = decls
-
-	printer.Fprint(os.Stdout, fset, f)
+	return decls
 }
 
 func fatal(err error) {
