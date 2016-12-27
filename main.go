@@ -38,12 +38,12 @@ func processFile(fset *token.FileSet, f *ast.File) {
 
 		for _, spec := range genDecl.Specs {
 			typeSpec, ok := spec.(*ast.TypeSpec)
-
 			if !ok {
 				continue
 			}
 
-			if _, ok := typeSpec.Type.(*ast.InterfaceType); !ok {
+			_, ok = typeSpec.Type.(*ast.InterfaceType)
+			if !ok {
 				continue
 			}
 
