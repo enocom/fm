@@ -109,13 +109,28 @@ func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 // reflect the various input arguments defined in the interface
 func buildInputStruct(prefix, fieldname string, list []*ast.Field) *ast.Field {
 	var fields []*ast.Field
+	var argOffset int
+	var argName string
+
 	for idx, param := range list {
-		// TODO: handle multiple inputs of same type
-		argName := fmt.Sprintf("%s%d", prefix, idx)
-		fields = append(fields, &ast.Field{
-			Names: []*ast.Ident{ast.NewIdent(argName)},
-			Type:  param.Type,
-		})
+		argName = fmt.Sprintf("%s%d", prefix, idx+argOffset)
+		// if we have multiple args of same type,
+		// add fields for each
+		if len(param.Names) > 1 {
+			for range param.Names {
+				argName = fmt.Sprintf("%s%d", prefix, idx+argOffset)
+				fields = append(fields, &ast.Field{
+					Names: []*ast.Ident{ast.NewIdent(argName)},
+					Type:  param.Type,
+				})
+				argOffset += 1
+			}
+		} else {
+			fields = append(fields, &ast.Field{
+				Names: []*ast.Ident{ast.NewIdent(argName)},
+				Type:  param.Type,
+			})
+		}
 	}
 	return &ast.Field{
 		Names: []*ast.Ident{ast.NewIdent(fieldname)},
