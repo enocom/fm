@@ -86,15 +86,15 @@ func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 		}
 		list = append(list, wasCalled)
 
-		// add Input struct with params
+		// add Input struct with arguments
 		if len(funcType.Params.List) > 0 {
-			inputStruct := buildStruct("Arg", methodName+"_Input", funcType.Params.List)
+			inputStruct := buildStruct(methodName+"_Input", "Arg", funcType.Params.List)
 			list = append(list, inputStruct)
 		}
 
-		// add Output struct with return values
+		// add Output struct with result values
 		if len(funcType.Results.List) > 0 {
-			outputStruct := buildStruct("Ret", methodName+"_Output", funcType.Results.List)
+			outputStruct := buildStruct(methodName+"_Output", "Ret", funcType.Results.List)
 			list = append(list, outputStruct)
 		}
 	}
@@ -107,13 +107,12 @@ func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 
 // buildInputStruct writes a struct type whose fields
 // reflect the various input arguments defined in the interface
-func buildStruct(prefix, fieldname string, list []*ast.Field) *ast.Field {
+func buildStruct(fieldname, prefix string, list []*ast.Field) *ast.Field {
 	var fields []*ast.Field
 	var argOffset int
 	var argName string
 
 	for idx, param := range list {
-		argName = fmt.Sprintf("%s%d", prefix, idx+argOffset)
 		// if we have multiple args of same type,
 		// add fields for each
 		if len(param.Names) > 1 {
@@ -126,6 +125,7 @@ func buildStruct(prefix, fieldname string, list []*ast.Field) *ast.Field {
 				argOffset += 1
 			}
 		} else {
+			argName = fmt.Sprintf("%s%d", prefix, idx+argOffset)
 			fields = append(fields, &ast.Field{
 				Names: []*ast.Ident{ast.NewIdent(argName)},
 				Type:  param.Type,
