@@ -1,5 +1,5 @@
 //go:generate genspy
-package main
+package example
 
 // Doer does things, sometimes repeatedly
 type Doer interface {
