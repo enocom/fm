@@ -113,8 +113,8 @@ func buildStruct(fieldname, prefix string, list []*ast.Field) *ast.Field {
 	var argName string
 
 	for idx, param := range list {
-		// if we have multiple args of same type,
-		// add fields for each
+		// if we have multiple arguments of the same type,
+		// add fields for each argument
 		if len(param.Names) > 1 {
 			for range param.Names {
 				argName = fmt.Sprintf("%s%d", prefix, idx+argOffset)
@@ -171,8 +171,8 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 }
 
 func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockStmt {
-	// 2) for each Param, save it off in the corresponding Input field
-	// 3) return set values for specified in Output
+	// TODO: for each Param, save it off in the corresponding Input field
+	// TODO: return set values for specified in Output
 	calledStmt := &ast.AssignStmt{
 		Lhs: []ast.Expr{
 			&ast.SelectorExpr{
