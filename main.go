@@ -17,11 +17,11 @@ func main() {
 		fatal(err)
 	}
 
-	for _, p := range pkgs {
+	for name, p := range pkgs {
 		for _, f := range p.Files {
 			// ast.Print(fset, f)
 			f.Decls = generateSpies(f.Decls)
-			f.Name = ast.NewIdent("example_test")
+			f.Name = ast.NewIdent(name + "_test")
 
 			printer.Fprint(os.Stdout, fset, f)
 		}
