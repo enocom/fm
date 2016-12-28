@@ -55,7 +55,7 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 				continue
 			}
 
-			mutatateToStruct(typeSpec, interfaceType)
+			mutateToStruct(typeSpec, interfaceType)
 			funcDecls := createSpyFuncs(typeSpec, interfaceType)
 
 			decls = append(decls, genDecl)
@@ -67,9 +67,9 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 	return decls
 }
 
-// mutatateToStruct mutates the underlying interface type into a struct type
+// mutateToStruct mutates the underlying interface type into a struct type
 // and adds implentations of the interface's methods
-func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
+func mutateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 	t.Name = ast.NewIdent("Fake" + t.Name.Name)
 
 	var list []*ast.Field
