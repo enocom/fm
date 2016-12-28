@@ -88,14 +88,14 @@ func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 
 		// add Input struct with params
 		if len(funcType.Params.List) > 0 {
-			input := buildInputStruct("Arg", methodName+"_Input", funcType.Params.List)
-			list = append(list, input)
+			inputStruct := buildStruct("Arg", methodName+"_Input", funcType.Params.List)
+			list = append(list, inputStruct)
 		}
 
 		// add Output struct with return values
 		if len(funcType.Results.List) > 0 {
-			// for idx, result := range funcType.Results.List {
-			// }
+			outputStruct := buildStruct("Ret", methodName+"_Output", funcType.Results.List)
+			list = append(list, outputStruct)
 		}
 	}
 
@@ -107,7 +107,7 @@ func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 
 // buildInputStruct writes a struct type whose fields
 // reflect the various input arguments defined in the interface
-func buildInputStruct(prefix, fieldname string, list []*ast.Field) *ast.Field {
+func buildStruct(prefix, fieldname string, list []*ast.Field) *ast.Field {
 	var fields []*ast.Field
 	var argOffset int
 	var argName string
