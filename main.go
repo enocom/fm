@@ -17,12 +17,14 @@ func main() {
 		fatal(err)
 	}
 
+	// TODO: ensure multiple files output into single file
 	for name, p := range pkgs {
 		for _, f := range p.Files {
 			// ast.Print(fset, f)
 			f.Decls = generateSpies(f.Decls)
 			f.Name = ast.NewIdent(name + "_test")
 
+			// TODO: Write to file instead of standard out
 			printer.Fprint(os.Stdout, fset, f)
 		}
 	}
@@ -53,11 +55,7 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 				continue
 			}
 
-			// found an interface
-			// time to create a spy
-			createSpyStruct(typeSpec, interfaceType)
-
-			// add implentations of the interface's methods
+			mutatateToStruct(typeSpec, interfaceType)
 			funcDecls := createSpyFuncs(typeSpec, interfaceType)
 
 			decls = append(decls, genDecl)
@@ -69,19 +67,62 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 	return decls
 }
 
-// createSpy mutates the underlying interface type into a struct type
+// mutatateToStruct mutates the underlying interface type into a struct type
 // and adds implentations of the interface's methods
-func createSpyStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
-	// start by prefixing the interface's name with "Fake"
+func mutatateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 	t.Name = ast.NewIdent("Fake" + t.Name.Name)
 
-	// convert the interface into a struct
-	structType := &ast.StructType{
-		Struct:     i.Interface,      // position of the interface keyword
-		Fields:     &ast.FieldList{}, // no fields
+	var list []*ast.Field
+	for _, field := range i.Methods.List {
+		funcType, ok := field.Type.(*ast.FuncType)
+		if !ok {
+			continue // TODO: when would this happen?
+		}
+
+		methodName := field.Names[0].Name
+		wasCalled := &ast.Field{
+			Names: []*ast.Ident{ast.NewIdent(methodName + "_Called")},
+			Type:  ast.NewIdent("bool"),
+		}
+		list = append(list, wasCalled)
+
+		// add Input struct with params
+		if len(funcType.Params.List) > 0 {
+			input := buildInputStruct("Arg", methodName+"_Input", funcType.Params.List)
+			list = append(list, input)
+		}
+
+		// add Output struct with return values
+		if len(funcType.Results.List) > 0 {
+			// for idx, result := range funcType.Results.List {
+			// }
+		}
+	}
+
+	t.Type = &ast.StructType{
+		Fields:     &ast.FieldList{List: list},
 		Incomplete: i.Incomplete,
 	}
-	t.Type = structType
+}
+
+// buildInputStruct writes a struct type whose fields
+// reflect the various input arguments defined in the interface
+func buildInputStruct(prefix, fieldname string, list []*ast.Field) *ast.Field {
+	var fields []*ast.Field
+	for idx, param := range list {
+		// TODO: handle multiple inputs of same type
+		argName := fmt.Sprintf("%s%d", prefix, idx)
+		fields = append(fields, &ast.Field{
+			Names: []*ast.Ident{ast.NewIdent(argName)},
+			Type:  param.Type,
+		})
+	}
+	return &ast.Field{
+		Names: []*ast.Ident{ast.NewIdent(fieldname)},
+		Type: &ast.StructType{
+			Fields: &ast.FieldList{List: fields},
+		},
+	}
 }
 
 // createSpyFuncs creates spy functions which implement the methods of
@@ -100,8 +141,7 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 
 		funcType, ok := list.Type.(*ast.FuncType)
 		if !ok {
-			// the type cast will fail on embedded types
-			// ignoring for now
+			// TODO: When will this happen?
 			continue
 		}
 
@@ -109,6 +149,7 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 			List: []ast.Stmt{
 				&ast.ReturnStmt{
 					Results: []ast.Expr{
+						// TODO: stop hard coding these values
 						&ast.BasicLit{Kind: token.INT, Value: "0"},
 						ast.NewIdent("nil"),
 					},
@@ -117,10 +158,10 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 		}
 
 		funcDecls = append(funcDecls, &ast.FuncDecl{
-			Recv: recv,          // *FieldList
-			Name: list.Names[0], // *Ident
-			Type: funcType,      // *FuncType
-			Body: blockStmt,     // *BlockStmt
+			Recv: recv,
+			Name: list.Names[0],
+			Type: funcType,
+			Body: blockStmt,
 		})
 	}
 	return funcDecls
