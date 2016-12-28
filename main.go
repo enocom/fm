@@ -54,10 +54,16 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 			}
 
 			// found an interface
-			// time to create a mock
-			createSpy(typeSpec, interfaceType)
+			// time to create a spy
+			createSpyStruct(typeSpec, interfaceType)
+
+			// add implentations of the interface's methods
+			funcDecls := createSpyFuncs(typeSpec, interfaceType)
 
 			decls = append(decls, genDecl)
+			for _, fd := range funcDecls {
+				decls = append(decls, fd)
+			}
 		}
 	}
 	return decls
@@ -65,17 +71,59 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 
 // createSpy mutates the underlying interface type into a struct type
 // and adds implentations of the interface's methods
-func createSpy(typeSpec *ast.TypeSpec, interfaceType *ast.InterfaceType) {
+func createSpyStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 	// start by prefixing the interface's name with "Fake"
-	typeSpec.Name = ast.NewIdent("Fake" + typeSpec.Name.Name)
+	t.Name = ast.NewIdent("Fake" + t.Name.Name)
 
 	// convert the interface into a struct
 	structType := &ast.StructType{
-		Struct:     interfaceType.Interface, // position of the interface keyword
-		Fields:     &ast.FieldList{},        // no fields
-		Incomplete: interfaceType.Incomplete,
+		Struct:     i.Interface,      // position of the interface keyword
+		Fields:     &ast.FieldList{}, // no fields
+		Incomplete: i.Incomplete,
 	}
-	typeSpec.Type = structType
+	t.Type = structType
+}
+
+// createSpyFuncs creates spy functions which implement the methods of
+// the interface type
+func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
+	var funcDecls []*ast.FuncDecl
+	for _, list := range i.Methods.List {
+		recv := &ast.FieldList{
+			List: []*ast.Field{
+				&ast.Field{
+					Names: []*ast.Ident{ast.NewIdent("f")},
+					Type:  &ast.StarExpr{X: t.Name},
+				},
+			},
+		}
+
+		funcType, ok := list.Type.(*ast.FuncType)
+		if !ok {
+			// the type cast will fail on embedded types
+			// ignoring for now
+			continue
+		}
+
+		blockStmt := &ast.BlockStmt{
+			List: []ast.Stmt{
+				&ast.ReturnStmt{
+					Results: []ast.Expr{
+						&ast.BasicLit{Kind: token.INT, Value: "0"},
+						ast.NewIdent("nil"),
+					},
+				},
+			},
+		}
+
+		funcDecls = append(funcDecls, &ast.FuncDecl{
+			Recv: recv,          // *FieldList
+			Name: list.Names[0], // *Ident
+			Type: funcType,      // *FuncType
+			Body: blockStmt,     // *BlockStmt
+		})
+	}
+	return funcDecls
 }
 
 func fatal(err error) {
