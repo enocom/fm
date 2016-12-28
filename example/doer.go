@@ -7,6 +7,14 @@ type Doer interface {
 	DoItAgain(task, prefix string) (count int, err error)
 }
 
+type Delegater struct {
+	Delegate Doer
+}
+
+func (d *Delegater) DoSomething(task string) (int, error) {
+	return d.Delegate.DoIt(task, false)
+}
+
 // RealDoer get stuff done for real
 type RealDoer struct {
 }
