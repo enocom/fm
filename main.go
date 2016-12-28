@@ -164,23 +164,37 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 			Recv: recv,
 			Name: list.Names[0],
 			Type: funcType,
-			Body: createBlockStmt(),
+			Body: createBlockStmt(t, list.Names[0].Name, funcType),
 		})
 	}
 	return funcDecls
 }
 
-func createBlockStmt() *ast.BlockStmt {
-	// TODO: save off args, return designated values
-	return &ast.BlockStmt{
-		List: []ast.Stmt{
-			&ast.ReturnStmt{
-				Results: []ast.Expr{
-					&ast.BasicLit{Kind: token.INT, Value: "0"},
-					ast.NewIdent("nil"),
-				},
+func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockStmt {
+	// 2) for each Param, save it off in the corresponding Input field
+	// 3) return set values for specified in Output
+	calledStmt := &ast.AssignStmt{
+		Lhs: []ast.Expr{
+			&ast.SelectorExpr{
+				X:   ast.NewIdent("f"),
+				Sel: ast.NewIdent(fname + "_Called"),
 			},
 		},
+		Tok: token.ASSIGN,
+		Rhs: []ast.Expr{
+			ast.NewIdent("true"),
+		},
+	}
+
+	returnStmt := &ast.ReturnStmt{
+		Results: []ast.Expr{
+			&ast.BasicLit{Kind: token.INT, Value: "0"},
+			ast.NewIdent("nil"),
+		},
+	}
+
+	return &ast.BlockStmt{
+		List: []ast.Stmt{calledStmt, returnStmt},
 	}
 }
 
