@@ -148,7 +148,7 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 		recv := &ast.FieldList{
 			List: []*ast.Field{
 				&ast.Field{
-					Names: []*ast.Ident{ast.NewIdent("f")},
+					Names: []*ast.Ident{ast.NewIdent("f")}, // "f" for fake
 					Type:  &ast.StarExpr{X: t.Name},
 				},
 			},
@@ -160,26 +160,28 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 			continue
 		}
 
-		blockStmt := &ast.BlockStmt{
-			List: []ast.Stmt{
-				&ast.ReturnStmt{
-					Results: []ast.Expr{
-						// TODO: stop hard coding these values
-						&ast.BasicLit{Kind: token.INT, Value: "0"},
-						ast.NewIdent("nil"),
-					},
-				},
-			},
-		}
-
 		funcDecls = append(funcDecls, &ast.FuncDecl{
 			Recv: recv,
 			Name: list.Names[0],
 			Type: funcType,
-			Body: blockStmt,
+			Body: createBlockStmt(),
 		})
 	}
 	return funcDecls
+}
+
+func createBlockStmt() *ast.BlockStmt {
+	// TODO: save off args, return designated values
+	return &ast.BlockStmt{
+		List: []ast.Stmt{
+			&ast.ReturnStmt{
+				Results: []ast.Expr{
+					&ast.BasicLit{Kind: token.INT, Value: "0"},
+					ast.NewIdent("nil"),
+				},
+			},
+		},
+	}
 }
 
 func fatal(err error) {
