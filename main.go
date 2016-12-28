@@ -19,13 +19,10 @@ func main() {
 
 	for _, p := range pkgs {
 		for _, f := range p.Files {
-			interfaceDecls := findInterfaces(f.Decls)
-			decls := generateDecls(interfaceDecls)
 			// ast.Print(fset, f)
-
-			f.Decls = decls
-
+			f.Decls = generateSpies(f.Decls)
 			f.Name = ast.NewIdent("example_test")
+
 			printer.Fprint(os.Stdout, fset, f)
 		}
 	}
@@ -35,32 +32,9 @@ func isSrcFile(info os.FileInfo) bool {
 	return !strings.HasSuffix(info.Name(), "_test.go")
 }
 
-func findInterfaces(ds []ast.Decl) []ast.Decl {
-	var decls []ast.Decl
-	for _, d := range ds {
-		genDecl, ok := d.(*ast.GenDecl)
-		if !ok {
-			continue
-		}
-
-		for _, spec := range genDecl.Specs {
-			typeSpec, ok := spec.(*ast.TypeSpec)
-			if !ok {
-				continue
-			}
-
-			_, ok = typeSpec.Type.(*ast.InterfaceType)
-			if !ok {
-				continue
-			}
-
-			decls = append(decls, d)
-		}
-	}
-	return decls
-}
-
-func generateDecls(ds []ast.Decl) []ast.Decl {
+// generateSpies transforms all the interfaces in the list of declarations
+// into spies in the form of structs with implemented functions
+func generateSpies(ds []ast.Decl) []ast.Decl {
 	var decls []ast.Decl
 	for _, d := range ds {
 		genDecl, ok := d.(*ast.GenDecl)
@@ -79,26 +53,29 @@ func generateDecls(ds []ast.Decl) []ast.Decl {
 				continue
 			}
 
-			// if we've made it this far, we have an interface to mock
+			// found an interface
+			// time to create a mock
+			createSpy(typeSpec, interfaceType)
 
-			// start by prefixing the interface's name with "Fake"
-			typeSpec.Name = ast.NewIdent("Fake" + typeSpec.Name.Name)
-
-			// convert the interface into a struct
-			structType := &ast.StructType{
-				Struct:     interfaceType.Interface, // position of the interface keyword
-				Fields:     &ast.FieldList{},        // no fields
-				Incomplete: interfaceType.Incomplete,
-			}
-			typeSpec.Type = structType
-
-			// save the decls into the slice
-			decls = append(decls, d)
-
-			// add FuncDecls for all the interface's methods
+			decls = append(decls, genDecl)
 		}
 	}
 	return decls
+}
+
+// createSpy mutates the underlying interface type into a struct type
+// and adds implentations of the interface's methods
+func createSpy(typeSpec *ast.TypeSpec, interfaceType *ast.InterfaceType) {
+	// start by prefixing the interface's name with "Fake"
+	typeSpec.Name = ast.NewIdent("Fake" + typeSpec.Name.Name)
+
+	// convert the interface into a struct
+	structType := &ast.StructType{
+		Struct:     interfaceType.Interface, // position of the interface keyword
+		Fields:     &ast.FieldList{},        // no fields
+		Incomplete: interfaceType.Incomplete,
+	}
+	typeSpec.Type = structType
 }
 
 func fatal(err error) {
