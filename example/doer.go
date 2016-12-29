@@ -6,11 +6,11 @@ type Doer interface {
 }
 
 // Delegater employs a Doer to complete tasks
-type Delegater struct {
+type Delegator struct {
 	Delegate Doer
 }
 
 // DoSomething passes the work to Doer
-func (d *Delegater) DoSomething(task string) (int, error) {
+func (d *Delegator) DoSomething(task string) (int, error) {
 	return d.Delegate.DoIt(task, false)
 }

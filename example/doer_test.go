@@ -9,7 +9,7 @@ import (
 
 func TestDelegatorCallsDoer(t *testing.T) {
 	fakeDoer := &FakeDoer{}
-	d := &example.Delegater{Delegate: fakeDoer}
+	d := &example.Delegator{Delegate: fakeDoer}
 
 	d.DoSomething("laundry")
 
@@ -23,7 +23,7 @@ func TestDelegatorCallsDoer(t *testing.T) {
 
 func TestDelegatorCallsDoerWithArgs(t *testing.T) {
 	fakeDoer := &FakeDoer{}
-	d := &example.Delegater{Delegate: fakeDoer}
+	d := &example.Delegator{Delegate: fakeDoer}
 
 	d.DoSomething("laundry")
 
@@ -47,7 +47,7 @@ func TestDelegatorReturnsDoerResult(t *testing.T) {
 	fakeDoer.DoIt_Output.Ret0 = 42
 	expectedErr := errors.New("some-error")
 	fakeDoer.DoIt_Output.Ret1 = expectedErr
-	d := &example.Delegater{Delegate: fakeDoer}
+	d := &example.Delegator{Delegate: fakeDoer}
 
 	n, err := d.DoSomething("laundry")
 

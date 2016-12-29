@@ -31,9 +31,9 @@ type FakeRepeater struct {
 	}
 }
 
-func (f *FakeRepeater) Repeat(task, prefix string) (count int, err error) {
+func (f *FakeRepeater) Repeat(task, rationale string) (count int, err error) {
 	f.Repeat_Called = true
 	f.Repeat_Input.Arg0 = task
-	f.Repeat_Input.Arg1 = prefix
+	f.Repeat_Input.Arg1 = rationale
 	return f.Repeat_Output.Ret0, f.Repeat_Output.Ret1
 }
