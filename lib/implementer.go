@@ -10,12 +10,18 @@ const (
 	recvName = "f"
 )
 
+// FuncImplementer accepts an interface and returns implementations
+// of its functions
 type FuncImplementer interface {
 	Implement(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl
 }
 
+// SpyFuncImplementer creates spy implementations of an interface's functions.
+// Meant to be used in conjuction with SpyStructConverter
 type SpyFuncImplementer struct{}
 
+// Implement returns a function declaration whose arguments are saved
+// as properties and whose return values are properties on a fake struct
 func (s *SpyFuncImplementer) Implement(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 	var funcDecls []*ast.FuncDecl
 	for _, list := range i.Methods.List {

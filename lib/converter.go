@@ -14,7 +14,8 @@ type StructConverter interface {
 	Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec
 }
 
-// SpyStructConverter converts interfaces into spies, i.e., test doubles
+// SpyStructConverter converts interfaces into spies, i.e., test doubles.
+// Meant to be used in conjuction with SpyFuncImplementer
 type SpyStructConverter struct{}
 
 // Convert mutates the ast.TypeSpec into a struct type with public properties
