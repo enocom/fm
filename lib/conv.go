@@ -9,17 +9,16 @@ const (
 	fakePrefix = "Fake"
 )
 
-// StructConv converts an interface type into a struct
+// StructConverter converts an interface type into a struct
 type StructConverter interface {
 	Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec
 }
 
-// SpyStructConv converts interfaces into spies, i.e., test doubles
+// SpyStructConverter converts interfaces into spies, i.e., test doubles
 type SpyStructConverter struct{}
 
-// IntfToStruct mutates the ast.TypeSpec into a struct type with
-// public properties for all parameters and return values declared
-// in the interface
+// Convert mutates the ast.TypeSpec into a struct type with public properties
+// for all parameters and all return values declared in the interface
 func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
 	t.Name = ast.NewIdent(fakePrefix + t.Name.Name)
 
