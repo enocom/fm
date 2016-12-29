@@ -2,13 +2,13 @@
 
 set -e
 
-function install_genspy {
+function install_fm {
     go install
 }
 
 function generate_spies {
     pushd example/ > /dev/null
-    genspy
+    fm
     popd > /dev/null
 }
 
@@ -17,7 +17,7 @@ function run_tests {
 }
 
 function main {
-    install_genspy
+    install_fm
     generate_spies
     run_tests
 }

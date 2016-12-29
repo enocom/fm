@@ -1,4 +1,4 @@
-package genspy
+package fm
 
 import "go/ast"
 

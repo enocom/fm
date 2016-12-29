@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/enocom/genspy/example"
+	"github.com/enocom/fm/example"
 )
 
 func TestDelegatorCallsDoer(t *testing.T) {
