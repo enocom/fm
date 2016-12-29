@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	fakePrefix = "Fake"
+	spyPrefix = "Spy"
 )
 
 // StructConverter converts an interface type into a struct
@@ -21,7 +21,7 @@ type SpyStructConverter struct{}
 // Convert mutates the ast.TypeSpec into a struct type with public properties
 // for all parameters and all return values declared in the interface
 func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
-	t.Name = ast.NewIdent(fakePrefix + t.Name.Name)
+	t.Name = ast.NewIdent(spyPrefix + t.Name.Name)
 
 	var list []*ast.Field
 	for _, field := range i.Methods.List {

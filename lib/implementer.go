@@ -21,7 +21,7 @@ type FuncImplementer interface {
 type SpyFuncImplementer struct{}
 
 // Implement returns a function declaration whose arguments are saved
-// as properties and whose return values are properties on a fake struct
+// as properties and whose return values are properties on a spy struct
 func (s *SpyFuncImplementer) Implement(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 	var funcDecls []*ast.FuncDecl
 	for _, list := range i.Methods.List {
@@ -114,7 +114,7 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 	for idx := range f.Results.List {
 		results = append(results, &ast.SelectorExpr{
 			X: &ast.SelectorExpr{
-				X:   ast.NewIdent(recvName), // for fake
+				X:   ast.NewIdent(recvName), // for spy
 				Sel: ast.NewIdent(fname + outputSuffix),
 			},
 			Sel: ast.NewIdent(fmt.Sprintf("%s%d", retPrefix, idx)),

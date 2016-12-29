@@ -8,13 +8,13 @@ import (
 )
 
 func TestDelegatorCallsDoer(t *testing.T) {
-	fakeDoer := &FakeDoer{}
-	d := &example.Delegator{Delegate: fakeDoer}
+	spyDoer := &SpyDoer{}
+	d := &example.Delegator{Delegate: spyDoer}
 
 	d.DoSomething("laundry")
 
 	want := true
-	got := fakeDoer.DoIt_Called
+	got := spyDoer.DoIt_Called
 
 	if want != got {
 		t.Errorf("wanted: %v, but got %v", want, got)
@@ -22,20 +22,20 @@ func TestDelegatorCallsDoer(t *testing.T) {
 }
 
 func TestDelegatorCallsDoerWithArgs(t *testing.T) {
-	fakeDoer := &FakeDoer{}
-	d := &example.Delegator{Delegate: fakeDoer}
+	spyDoer := &SpyDoer{}
+	d := &example.Delegator{Delegate: spyDoer}
 
 	d.DoSomething("laundry")
 
 	wantArg0 := "laundry"
-	gotArg0 := fakeDoer.DoIt_Input.Arg0
+	gotArg0 := spyDoer.DoIt_Input.Arg0
 
 	if wantArg0 != gotArg0 {
 		t.Errorf("wanted: %v, but got %v", wantArg0, gotArg0)
 	}
 
 	wantArg1 := false
-	gotArg1 := fakeDoer.DoIt_Input.Arg1
+	gotArg1 := spyDoer.DoIt_Input.Arg1
 
 	if wantArg1 != gotArg1 {
 		t.Errorf("wanted: %v, but got %v", wantArg1, gotArg1)
@@ -43,11 +43,11 @@ func TestDelegatorCallsDoerWithArgs(t *testing.T) {
 }
 
 func TestDelegatorReturnsDoerResult(t *testing.T) {
-	fakeDoer := &FakeDoer{}
-	fakeDoer.DoIt_Output.Ret0 = 42
+	spyDoer := &SpyDoer{}
+	spyDoer.DoIt_Output.Ret0 = 42
 	expectedErr := errors.New("some-error")
-	fakeDoer.DoIt_Output.Ret1 = expectedErr
-	d := &example.Delegator{Delegate: fakeDoer}
+	spyDoer.DoIt_Output.Ret1 = expectedErr
+	d := &example.Delegator{Delegate: spyDoer}
 
 	n, err := d.DoSomething("laundry")
 
@@ -67,7 +67,7 @@ func TestDelegatorReturnsDoerResult(t *testing.T) {
 }
 
 func TestDelegatorCallsRepeater(t *testing.T) {
-	r := &FakeRepeater{}
+	r := &SpyRepeater{}
 	d := &example.Delegator{Repeater: r}
 
 	d.DoSomethingAgain("laundry", "still not done")
@@ -81,7 +81,7 @@ func TestDelegatorCallsRepeater(t *testing.T) {
 }
 
 func TestDelegatorCallsRepeaterWithArgs(t *testing.T) {
-	r := &FakeRepeater{}
+	r := &SpyRepeater{}
 	d := &example.Delegator{Repeater: r}
 
 	d.DoSomethingAgain("walk the dog", "he still won't sit still")
@@ -102,7 +102,7 @@ func TestDelegatorCallsRepeaterWithArgs(t *testing.T) {
 }
 
 func TestDelegatorReturnsRepeaterResult(t *testing.T) {
-	r := &FakeRepeater{}
+	r := &SpyRepeater{}
 	r.Repeat_Output.Ret0 = 42
 	expectedErr := errors.New("cat refuses")
 	r.Repeat_Output.Ret1 = expectedErr
