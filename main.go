@@ -10,26 +10,38 @@ import (
 	"strings"
 )
 
+const (
+	pwd         = "."
+	spyFileName = "spy_test.go"
+
+	fakePrefix   = "Fake"
+	recvName     = "f"
+	inputSuffix  = "_Input"
+	outputSuffix = "_Output"
+	argPrefix    = "Arg"
+	retPrefix    = "Ret"
+)
+
 func main() {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, ".", isSrcFile, 0)
+	pkgs, err := parser.ParseDir(fset, pwd, isSrcFile, 0)
 	if err != nil {
 		fatal(err)
 	}
 
-	for name, p := range pkgs {
-		spyFile, err := os.Create("spy_test.go")
+	for pname, p := range pkgs {
+		spyFile, err := os.Create(spyFileName)
 		if err != nil {
 			fatal(err)
 		}
 
 		var decls []ast.Decl
 		for _, f := range p.Files {
-			decls = append(decls, generateSpies(f.Decls)...)
+			decls = append(decls, generateSpyDecls(f.Decls)...)
 		}
 
 		astFile := &ast.File{
-			Name:  ast.NewIdent(name + "_test"),
+			Name:  ast.NewIdent(pname + "_test"),
 			Decls: decls,
 		}
 
@@ -43,7 +55,7 @@ func isSrcFile(info os.FileInfo) bool {
 
 // generateSpies transforms all the interfaces in the list of declarations
 // into spies in the form of structs with implemented functions
-func generateSpies(ds []ast.Decl) []ast.Decl {
+func generateSpyDecls(ds []ast.Decl) []ast.Decl {
 	var decls []ast.Decl
 	for _, d := range ds {
 		genDecl, ok := d.(*ast.GenDecl)
@@ -77,7 +89,7 @@ func generateSpies(ds []ast.Decl) []ast.Decl {
 // mutateToStruct mutates the underlying interface type into a struct type
 // and adds implentations of the interface's methods
 func mutateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
-	t.Name = ast.NewIdent("Fake" + t.Name.Name)
+	t.Name = ast.NewIdent(fakePrefix + t.Name.Name)
 
 	var list []*ast.Field
 	for _, field := range i.Methods.List {
@@ -95,13 +107,13 @@ func mutateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 
 		// add Input struct with arguments
 		if len(funcType.Params.List) > 0 {
-			inputStruct := buildStruct(methodName+"_Input", "Arg", funcType.Params.List)
+			inputStruct := buildStruct(methodName+inputSuffix, argPrefix, funcType.Params.List)
 			list = append(list, inputStruct)
 		}
 
 		// add Output struct with result values
 		if len(funcType.Results.List) > 0 {
-			outputStruct := buildStruct(methodName+"_Output", "Ret", funcType.Results.List)
+			outputStruct := buildStruct(methodName+outputSuffix, retPrefix, funcType.Results.List)
 			list = append(list, outputStruct)
 		}
 	}
@@ -155,7 +167,7 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 		recv := &ast.FieldList{
 			List: []*ast.Field{
 				&ast.Field{
-					Names: []*ast.Ident{ast.NewIdent("f")}, // "f" for fake
+					Names: []*ast.Ident{ast.NewIdent(recvName)},
 					Type:  &ast.StarExpr{X: t.Name},
 				},
 			},
@@ -184,7 +196,7 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 	calledStmt := &ast.AssignStmt{
 		Lhs: []ast.Expr{
 			&ast.SelectorExpr{
-				X:   ast.NewIdent("f"),
+				X:   ast.NewIdent(recvName),
 				Sel: ast.NewIdent(fname + "_Called"),
 			},
 		},
@@ -205,10 +217,10 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 					Lhs: []ast.Expr{
 						&ast.SelectorExpr{
 							X: &ast.SelectorExpr{
-								X:   ast.NewIdent("f"),
-								Sel: ast.NewIdent(fname + "_Input"),
+								X:   ast.NewIdent(recvName),
+								Sel: ast.NewIdent(fname + inputSuffix),
 							},
-							Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Arg", idx+offset)),
+							Sel: ast.NewIdent(fmt.Sprintf("%s%d", argPrefix, idx+offset)),
 						},
 					},
 					Tok: token.ASSIGN,
@@ -223,10 +235,10 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 				Lhs: []ast.Expr{
 					&ast.SelectorExpr{
 						X: &ast.SelectorExpr{
-							X:   ast.NewIdent("f"),
-							Sel: ast.NewIdent(fname + "_Input"),
+							X:   ast.NewIdent(recvName),
+							Sel: ast.NewIdent(fname + inputSuffix),
 						},
-						Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Arg", idx+offset)),
+						Sel: ast.NewIdent(fmt.Sprintf("%s%d", argPrefix, idx+offset)),
 					},
 				},
 				Tok: token.ASSIGN,
@@ -241,10 +253,10 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 	for idx, _ := range f.Results.List {
 		results = append(results, &ast.SelectorExpr{
 			X: &ast.SelectorExpr{
-				X:   ast.NewIdent("f"), // for fake
-				Sel: ast.NewIdent(fname + "_Output"),
+				X:   ast.NewIdent(recvName), // for fake
+				Sel: ast.NewIdent(fname + outputSuffix),
 			},
-			Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Ret", idx)),
+			Sel: ast.NewIdent(fmt.Sprintf("%s%d", retPrefix, idx)),
 		})
 	}
 	if len(results) > 0 {
