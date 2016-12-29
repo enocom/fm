@@ -1,6 +1,7 @@
 package example_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/enocom/genspy/example"
@@ -44,7 +45,8 @@ func TestDelegatorCallsDoerWithArgs(t *testing.T) {
 func TestDelegatorReturnsDoerResult(t *testing.T) {
 	fakeDoer := &FakeDoer{}
 	fakeDoer.DoIt_Output.Ret0 = 42
-	fakeDoer.DoIt_Output.Ret1 = nil
+	expectedErr := errors.New("some-error")
+	fakeDoer.DoIt_Output.Ret1 = expectedErr
 	d := &example.Delegater{Delegate: fakeDoer}
 
 	n, err := d.DoSomething("laundry")
@@ -56,7 +58,7 @@ func TestDelegatorReturnsDoerResult(t *testing.T) {
 		t.Errorf("wanted: %v, but got %v", wantRet0, gotRet0)
 	}
 
-	var wantRet1 error = nil
+	wantRet1 := expectedErr
 	gotRet1 := err
 
 	if wantRet1 != gotRet1 {

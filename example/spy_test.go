@@ -10,35 +10,30 @@ type FakeDoer struct {
 		Ret0 int
 		Ret1 error
 	}
-	DoItAgain_Called bool
-	DoItAgain_Input  struct {
+}
+
+func (f *FakeDoer) DoIt(task string, graciously bool) (int, error) {
+	f.DoIt_Called = true
+	f.DoIt_Input.Arg0 = task
+	f.DoIt_Input.Arg1 = graciously
+	return f.DoIt_Output.Ret0, f.DoIt_Output.Ret1
+}
+
+type FakeRepeater struct {
+	Repeat_Called bool
+	Repeat_Input  struct {
 		Arg0 string
 		Arg1 string
 	}
-	DoItAgain_Output struct {
+	Repeat_Output struct {
 		Ret0 int
 		Ret1 error
 	}
 }
 
-func (f *FakeDoer) DoIt(task string, repeat bool) (int, error) {
-	f.DoIt_Called = true
-	f.DoIt_Input.Arg0 = task
-	f.DoIt_Input.Arg1 = repeat
-	return f.DoIt_Output.Ret0, f.DoIt_Output.Ret1
+func (f *FakeRepeater) Repeat(task, prefix string) (count int, err error) {
+	f.Repeat_Called = true
+	f.Repeat_Input.Arg0 = task
+	f.Repeat_Input.Arg1 = prefix
+	return f.Repeat_Output.Ret0, f.Repeat_Output.Ret1
 }
-func (f *FakeDoer) DoItAgain(task, prefix string) (count int, err error) {
-	f.DoItAgain_Called = true
-	f.DoItAgain_Input.Arg0 = task
-	f.DoItAgain_Input.Arg1 = prefix
-	return f.DoItAgain_Output.Ret0, f.DoItAgain_Output.Ret1
-}
-
-type FakeFooer struct {
-	Foo_Called bool
-	Foo_Output struct {
-		Ret0 int
-	}
-}
-
-func (f *FakeFooer) Foo() int { f.Foo_Called = true; return f.Foo_Output.Ret0 }

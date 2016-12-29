@@ -2,8 +2,7 @@ package example
 
 // Doer does things, sometimes repeatedly
 type Doer interface {
-	DoIt(task string, repeat bool) (int, error)
-	DoItAgain(task, prefix string) (count int, err error)
+	DoIt(task string, graciously bool) (int, error)
 }
 
 type Delegater struct {
