@@ -171,7 +171,9 @@ func createSpyFuncs(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
 }
 
 func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockStmt {
-	// TODO: for each Param, save it off in the corresponding Input field
+	var list []ast.Stmt
+
+	// add called assignment statement
 	calledStmt := &ast.AssignStmt{
 		Lhs: []ast.Expr{
 			&ast.SelectorExpr{
@@ -184,7 +186,50 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 			ast.NewIdent("true"),
 		},
 	}
+	list = append(list, calledStmt)
 
+	// add assignment for each param
+	offset := 0
+	for idx, field := range f.Params.List {
+		// make assignments for multiple fields with same type
+		if len(field.Names) > 1 {
+			for i, name := range field.Names {
+				assignStmt := &ast.AssignStmt{
+					Lhs: []ast.Expr{
+						&ast.SelectorExpr{
+							X: &ast.SelectorExpr{
+								X:   ast.NewIdent("f"),
+								Sel: ast.NewIdent(fname + "_Input"),
+							},
+							Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Arg", i+offset)),
+						},
+					},
+					Tok: token.ASSIGN,
+					Rhs: []ast.Expr{name},
+				}
+				list = append(list, assignStmt)
+
+				offset += 1
+			}
+		} else {
+			assignStmt := &ast.AssignStmt{
+				Lhs: []ast.Expr{
+					&ast.SelectorExpr{
+						X: &ast.SelectorExpr{
+							X:   ast.NewIdent("f"),
+							Sel: ast.NewIdent(fname + "_Input"),
+						},
+						Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Arg", idx+offset)),
+					},
+				},
+				Tok: token.ASSIGN,
+				Rhs: []ast.Expr{field.Names[0]},
+			}
+			list = append(list, assignStmt)
+		}
+	}
+
+	// add return statement if there are values to return
 	var results []ast.Expr
 	for idx, _ := range f.Results.List {
 		results = append(results, &ast.SelectorExpr{
@@ -195,12 +240,11 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 			Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Ret", idx)),
 		})
 	}
-
-	returnStmt := &ast.ReturnStmt{Results: results}
-
-	return &ast.BlockStmt{
-		List: []ast.Stmt{calledStmt, returnStmt},
+	if len(results) > 0 {
+		list = append(list, &ast.ReturnStmt{Results: results})
 	}
+
+	return &ast.BlockStmt{List: list}
 }
 
 func fatal(err error) {
