@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	conv := &genspy.SpyStructConv{}
+	conv := &genspy.SpyStructConverter{}
 	g := &genspy.SpyGenerator{Conv: conv}
 
 	c := &genspy.Cmd{Wd: ".", Dst: "spy_test.go", Gen: g}

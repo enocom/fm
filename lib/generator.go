@@ -9,7 +9,7 @@ type DeclGenerator interface {
 
 // SpyGenerator creates spy implementations of interface declarations
 type SpyGenerator struct {
-	Conv StructConv
+	Conv StructConverter
 }
 
 // Generate transforms all the interfaces in the list of declarations

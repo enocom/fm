@@ -7,17 +7,17 @@ import (
 )
 
 // StructConv converts an interface type into a struct
-type StructConv interface {
+type StructConverter interface {
 	IntfToStruct(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec
 }
 
 // SpyStructConv converts interfaces into spies, i.e., test doubles
-type SpyStructConv struct{}
+type SpyStructConverter struct{}
 
 // IntfToStruct mutates the ast.TypeSpec into a struct type with
 // public properties for all parameters and return values declared
 // in the interface
-func (s *SpyStructConv) IntfToStruct(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
+func (s *SpyStructConverter) IntfToStruct(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
 	t.Name = ast.NewIdent(fakePrefix + t.Name.Name)
 
 	var list []*ast.Field
