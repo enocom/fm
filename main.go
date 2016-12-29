@@ -17,20 +17,23 @@ func main() {
 		fatal(err)
 	}
 
-	spyFile, err := os.Create("spy_test.go")
-	if err != nil {
-		fatal(err)
-	}
-
-	// TODO: ensure multiple files output into single file
 	for name, p := range pkgs {
-		for _, f := range p.Files {
-			// ast.Print(fset, f)
-			f.Decls = generateSpies(f.Decls)
-			f.Name = ast.NewIdent(name + "_test")
-
-			format.Node(spyFile, fset, f)
+		spyFile, err := os.Create("spy_test.go")
+		if err != nil {
+			fatal(err)
 		}
+
+		var decls []ast.Decl
+		for _, f := range p.Files {
+			decls = append(decls, generateSpies(f.Decls)...)
+		}
+
+		astFile := &ast.File{
+			Name:  ast.NewIdent(name + "_test"),
+			Decls: decls,
+		}
+
+		format.Node(spyFile, fset, astFile)
 	}
 }
 

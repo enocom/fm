@@ -33,3 +33,12 @@ func (f *FakeDoer) DoItAgain(task, prefix string) (count int, err error) {
 	f.DoItAgain_Input.Arg1 = prefix
 	return f.DoItAgain_Output.Ret0, f.DoItAgain_Output.Ret1
 }
+
+type FakeFooer struct {
+	Foo_Called bool
+	Foo_Output struct {
+		Ret0 int
+	}
+}
+
+func (f *FakeFooer) Foo() int { f.Foo_Called = true; return f.Foo_Output.Ret0 }
