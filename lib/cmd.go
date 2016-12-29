@@ -70,7 +70,9 @@ type DeclGenerator interface {
 }
 
 // SpyGenerator creates spy implementations of interface declarations
-type SpyGenerator struct{}
+type SpyGenerator struct {
+	Conv StructConv
+}
 
 // Generate transforms all the interfaces in the list of declarations
 // into spies in the form of structs with implemented functions
@@ -93,8 +95,10 @@ func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 				continue
 			}
 
-			mutateToStruct(typeSpec, interfaceType)              // TODO: extract
-			funcDecls := createSpyFuncs(typeSpec, interfaceType) // TODO: extract
+			// TODO: stop mutating typeSpec
+			g.Conv.IntfToStruct(typeSpec, interfaceType)
+			// TODO: extract
+			funcDecls := createSpyFuncs(typeSpec, interfaceType)
 
 			decls = append(decls, genDecl)
 			for _, fd := range funcDecls {
@@ -105,9 +109,21 @@ func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 	return decls
 }
 
-// mutateToStruct mutates the underlying interface type into a struct type
-// and adds implentations of the interface's methods
-func mutateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
+// StructConv converts an interface type into a struct with public properties
+// exposing all the values of the arguments and return values for method within
+// the interface
+type StructConv interface {
+	IntfToStruct(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec
+}
+
+// SpyStructConv converts interfaces into structs
+// to be used as test doubles
+type SpyStructConv struct{}
+
+// IntfToStruct mutates the ast.TypeSpec into a struct type with
+// public properties for all parameters and return values declared
+// in the interface
+func (s *SpyStructConv) IntfToStruct(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
 	t.Name = ast.NewIdent(fakePrefix + t.Name.Name)
 
 	var list []*ast.Field
@@ -141,6 +157,8 @@ func mutateToStruct(t *ast.TypeSpec, i *ast.InterfaceType) {
 		Fields:     &ast.FieldList{List: list},
 		Incomplete: i.Incomplete,
 	}
+
+	return t
 }
 
 // buildInputStruct writes a struct type whose fields
