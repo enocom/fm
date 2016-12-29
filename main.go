@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	g := genspy.NewGenerator(".", "spy_test.go")
-	g.Generate()
+	g := &genspy.Generator{Wd: ".", Dst: "spy_test.go"}
+	g.GenerateSpies()
 }

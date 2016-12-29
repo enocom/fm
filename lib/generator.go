@@ -19,41 +19,30 @@ const (
 	retPrefix    = "Ret"
 )
 
-// NewGenerator creates a generator which will find all interfaces
-// within `workingDir`, create spy implementations of those interfaces,
-// and then write the result out to a file whose name will be `fileDst`
-func NewGenerator(workingDir, fileDst string) Generator {
-	return &generator{wd: workingDir, dst: fileDst}
-}
-
 // Generator starts the generation process
-type Generator interface {
-	Generate()
-}
-
-type generator struct {
-	wd  string
-	dst string
+type Generator struct {
+	Wd  string
+	Dst string
 }
 
 // GenerateSpies isolates all interfaces within the AST and generates spy
 // implementations
-func (g *generator) GenerateSpies() {
+func (g *Generator) GenerateSpies() {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, g.wd, isSrcFile, 0)
+	pkgs, err := parser.ParseDir(fset, g.Wd, isSrcFile, 0)
 	if err != nil {
 		fatal(err)
 	}
 
 	for pname, p := range pkgs {
-		spyFile, err := os.Create(g.dst)
+		spyFile, err := os.Create(g.Dst)
 		if err != nil {
 			fatal(err)
 		}
 
 		var decls []ast.Decl
 		for _, f := range p.Files {
-			decls = append(decls, generateSpyDecls(f.Decls)...)
+			decls = append(decls, generateSpyDecls(f.Decls)...) // TODO: extract
 		}
 
 		astFile := &ast.File{
@@ -91,8 +80,8 @@ func generateSpyDecls(ds []ast.Decl) []ast.Decl {
 				continue
 			}
 
-			mutateToStruct(typeSpec, interfaceType)
-			funcDecls := createSpyFuncs(typeSpec, interfaceType)
+			mutateToStruct(typeSpec, interfaceType)              // TODO: extract
+			funcDecls := createSpyFuncs(typeSpec, interfaceType) // TODO: extract
 
 			decls = append(decls, genDecl)
 			for _, fd := range funcDecls {
