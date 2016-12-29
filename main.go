@@ -6,7 +6,8 @@ import (
 
 func main() {
 	conv := &genspy.SpyStructConverter{}
-	g := &genspy.SpyGenerator{Conv: conv}
+	impl := &genspy.SpyFuncImplementer{}
+	g := &genspy.SpyGenerator{Conv: conv, Impl: impl}
 
 	c := &genspy.Cmd{Wd: ".", Dst: "spy_test.go", Gen: g}
 	c.Run()

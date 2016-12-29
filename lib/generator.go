@@ -10,6 +10,7 @@ type DeclGenerator interface {
 // SpyGenerator creates spy implementations of interface declarations
 type SpyGenerator struct {
 	Conv StructConverter
+	Impl FuncImplementer
 }
 
 // Generate transforms all the interfaces in the list of declarations
@@ -36,7 +37,7 @@ func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 			// TODO: stop mutating typeSpec
 			g.Conv.IntfToStruct(typeSpec, interfaceType)
 			// TODO: extract
-			funcDecls := createSpyFuncs(typeSpec, interfaceType)
+			funcDecls := g.Impl.Implement(typeSpec, interfaceType)
 
 			decls = append(decls, genDecl)
 			for _, fd := range funcDecls {
