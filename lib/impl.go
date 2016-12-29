@@ -6,6 +6,10 @@ import (
 	"go/token"
 )
 
+const (
+	recvName = "f"
+)
+
 type FuncImplementer interface {
 	Implement(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl
 }

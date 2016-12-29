@@ -5,6 +5,10 @@ import (
 	"go/ast"
 )
 
+const (
+	fakePrefix = "Fake"
+)
+
 // StructConv converts an interface type into a struct
 type StructConverter interface {
 	Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec

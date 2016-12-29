@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	fakePrefix   = "Fake"
-	recvName     = "f"
 	inputSuffix  = "_Input"
 	outputSuffix = "_Output"
 	argPrefix    = "Arg"
