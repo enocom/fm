@@ -20,22 +20,22 @@ const (
 )
 
 // Generator starts the generation process
-type Generator struct {
+type Cmd struct {
 	Wd  string
 	Dst string
 }
 
 // GenerateSpies isolates all interfaces within the AST and generates spy
 // implementations
-func (g *Generator) GenerateSpies() {
+func (c *Cmd) Run() {
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, g.Wd, isSrcFile, 0)
+	pkgs, err := parser.ParseDir(fset, c.Wd, isSrcFile, 0)
 	if err != nil {
 		fatal(err)
 	}
 
 	for pname, p := range pkgs {
-		spyFile, err := os.Create(g.Dst)
+		spyFile, err := os.Create(c.Dst)
 		if err != nil {
 			fatal(err)
 		}
