@@ -1,4 +1,4 @@
-package main
+package genspy
 
 import (
 	"fmt"
@@ -21,9 +21,14 @@ const (
 
 // NewGenerator creates a generator which will find all interfaces
 // within `workingDir`, create spy implementations of those interfaces,
-// and then write the result out to the file named by `fileDst`
-func NewGenerator(workingDir, fileDst string) *generator {
+// and then write the result out to a file whose name will be `fileDst`
+func NewGenerator(workingDir, fileDst string) Generator {
 	return &generator{wd: workingDir, dst: fileDst}
+}
+
+// Generator starts the generation process
+type Generator interface {
+	Generate()
 }
 
 type generator struct {
@@ -31,7 +36,9 @@ type generator struct {
 	dst string
 }
 
-func (g *generator) Run() {
+// GenerateSpies isolates all interfaces within the AST and generates spy
+// implementations
+func (g *generator) GenerateSpies() {
 	fset := token.NewFileSet()
 	pkgs, err := parser.ParseDir(fset, g.wd, isSrcFile, 0)
 	if err != nil {
@@ -58,6 +65,7 @@ func (g *generator) Run() {
 	}
 }
 
+// isSrcFile is an ast.Filter which removes all test files
 func isSrcFile(info os.FileInfo) bool {
 	return !strings.HasSuffix(info.Name(), "_test.go")
 }
@@ -150,7 +158,7 @@ func buildStruct(fieldname, prefix string, list []*ast.Field) *ast.Field {
 					Names: []*ast.Ident{ast.NewIdent(argName)},
 					Type:  param.Type,
 				})
-				argOffset += 1
+				argOffset++
 			}
 		} else {
 			argName = fmt.Sprintf("%s%d", prefix, idx+argOffset)
@@ -237,7 +245,7 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 				}
 				list = append(list, assignStmt)
 
-				offset += 1
+				offset++
 			}
 		} else {
 			assignStmt := &ast.AssignStmt{
@@ -259,7 +267,7 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 
 	// add return statement if there are values to return
 	var results []ast.Expr
-	for idx, _ := range f.Results.List {
+	for idx := range f.Results.List {
 		results = append(results, &ast.SelectorExpr{
 			X: &ast.SelectorExpr{
 				X:   ast.NewIdent(recvName), // for fake

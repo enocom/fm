@@ -1,6 +1,10 @@
 package main
 
+import (
+	genspy "github.com/enocom/genspy/lib"
+)
+
 func main() {
-	g := NewGenerator(".", "spy_test.go")
-	g.Run()
+	g := genspy.NewGenerator(".", "spy_test.go")
+	g.Generate()
 }
