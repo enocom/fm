@@ -17,6 +17,11 @@ func main() {
 		fatal(err)
 	}
 
+	spyFile, err := os.Create("spy_test.go")
+	if err != nil {
+		fatal(err)
+	}
+
 	// TODO: ensure multiple files output into single file
 	for name, p := range pkgs {
 		for _, f := range p.Files {
@@ -24,8 +29,7 @@ func main() {
 			f.Decls = generateSpies(f.Decls)
 			f.Name = ast.NewIdent(name + "_test")
 
-			// TODO: Write to file instead of standard out
-			printer.Fprint(os.Stdout, fset, f)
+			printer.Fprint(spyFile, fset, f)
 		}
 	}
 }
@@ -193,7 +197,7 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 	for idx, field := range f.Params.List {
 		// make assignments for multiple fields with same type
 		if len(field.Names) > 1 {
-			for i, name := range field.Names {
+			for _, name := range field.Names {
 				assignStmt := &ast.AssignStmt{
 					Lhs: []ast.Expr{
 						&ast.SelectorExpr{
@@ -201,7 +205,7 @@ func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockS
 								X:   ast.NewIdent("f"),
 								Sel: ast.NewIdent(fname + "_Input"),
 							},
-							Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Arg", i+offset)),
+							Sel: ast.NewIdent(fmt.Sprintf("%s%d", "Arg", idx+offset)),
 						},
 					},
 					Tok: token.ASSIGN,
