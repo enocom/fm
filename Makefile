@@ -1,5 +1,2 @@
-test: clean
+test:
 	bin/test
-
-clean:
-	rm -f spy_test.go
