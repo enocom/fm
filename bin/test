@@ -2,7 +2,24 @@
 
 set -e
 
-go install
-pushd example/ > /dev/null
-go generate
-popd > /dev/null
+function install_genspy {
+    go install
+}
+
+function generate_spies {
+    pushd example/ > /dev/null
+    genspy
+    popd > /dev/null
+}
+
+function run_tests {
+    go test ./...
+}
+
+function main {
+    install_genspy
+    generate_spies
+    run_tests
+}
+
+main
