@@ -1,23 +1,23 @@
 package example_test
 
 type FakeDoer struct {
-	DoIt_Called	bool
-	DoIt_Input	struct {
-		Arg0	string
-		Arg1	bool
+	DoIt_Called bool
+	DoIt_Input  struct {
+		Arg0 string
+		Arg1 bool
 	}
-	DoIt_Output	struct {
-		Ret0	int
-		Ret1	error
+	DoIt_Output struct {
+		Ret0 int
+		Ret1 error
 	}
-	DoItAgain_Called	bool
-	DoItAgain_Input		struct {
-		Arg0	string
-		Arg1	string
+	DoItAgain_Called bool
+	DoItAgain_Input  struct {
+		Arg0 string
+		Arg1 string
 	}
-	DoItAgain_Output	struct {
-		Ret0	int
-		Ret1	error
+	DoItAgain_Output struct {
+		Ret0 int
+		Ret1 error
 	}
 }
 

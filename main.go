@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
-	"go/printer"
 	"go/token"
 	"os"
 	"strings"
@@ -29,7 +29,7 @@ func main() {
 			f.Decls = generateSpies(f.Decls)
 			f.Name = ast.NewIdent(name + "_test")
 
-			printer.Fprint(spyFile, fset, f)
+			format.Node(spyFile, fset, f)
 		}
 	}
 }
