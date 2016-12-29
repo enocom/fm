@@ -19,14 +19,18 @@ const (
 	retPrefix    = "Ret"
 )
 
-// Generator starts the generation process
+// Cmd passes all declarations found within the working directory to
+// the declaration generator, and writes the output to the filename
+// specified by Dst
 type Cmd struct {
 	Wd  string
 	Dst string
+	Gen DeclGenerator
 }
 
-// GenerateSpies isolates all interfaces within the AST and generates spy
-// implementations
+// Run parses the ast within the working directory and passes it to
+// the declaration generator. The result of the generator is then written
+// to the designated destination with *_test.go as the new package name
 func (c *Cmd) Run() {
 	fset := token.NewFileSet()
 	pkgs, err := parser.ParseDir(fset, c.Wd, isSrcFile, 0)
@@ -42,7 +46,8 @@ func (c *Cmd) Run() {
 
 		var decls []ast.Decl
 		for _, f := range p.Files {
-			decls = append(decls, generateSpyDecls(f.Decls)...) // TODO: extract
+			spyDecls := c.Gen.Generate(f.Decls)
+			decls = append(decls, spyDecls...)
 		}
 
 		astFile := &ast.File{
@@ -59,9 +64,17 @@ func isSrcFile(info os.FileInfo) bool {
 	return !strings.HasSuffix(info.Name(), "_test.go")
 }
 
-// generateSpies transforms all the interfaces in the list of declarations
+// DeclGenerator creates a new slice of ast.Decl based on the input
+type DeclGenerator interface {
+	Generate(ds []ast.Decl) []ast.Decl
+}
+
+// SpyGenerator creates spy implementations of interface declarations
+type SpyGenerator struct{}
+
+// Generate transforms all the interfaces in the list of declarations
 // into spies in the form of structs with implemented functions
-func generateSpyDecls(ds []ast.Decl) []ast.Decl {
+func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 	var decls []ast.Decl
 	for _, d := range ds {
 		genDecl, ok := d.(*ast.GenDecl)

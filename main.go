@@ -5,6 +5,8 @@ import (
 )
 
 func main() {
-	c := &genspy.Cmd{Wd: ".", Dst: "spy_test.go"}
+	g := &genspy.SpyGenerator{}
+
+	c := &genspy.Cmd{Wd: ".", Dst: "spy_test.go", Gen: g}
 	c.Run()
 }
