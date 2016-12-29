@@ -35,7 +35,7 @@ func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 			}
 
 			// TODO: stop mutating typeSpec
-			g.Conv.IntfToStruct(typeSpec, interfaceType)
+			g.Conv.Convert(typeSpec, interfaceType)
 			// TODO: extract
 			funcDecls := g.Impl.Implement(typeSpec, interfaceType)
 
