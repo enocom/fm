@@ -15,4 +15,3 @@ Writing a spy generator is the "Hello, World!" of AST parsing and generating in 
 - update import paths when necessary
 - add comment to generated code identifying it as such
 - add ci
-- add docs
