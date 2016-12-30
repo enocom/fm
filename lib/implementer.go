@@ -17,7 +17,7 @@ type FuncImplementer interface {
 }
 
 // SpyFuncImplementer creates spy implementations of an interface's functions.
-// Meant to be used in conjuction with SpyStructConverter
+// Meant to be used in conjunction with SpyStructConverter
 type SpyFuncImplementer struct{}
 
 // Implement returns a function declaration whose arguments are saved

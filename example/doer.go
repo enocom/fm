@@ -5,7 +5,7 @@ type Doer interface {
 	DoIt(task string, graciously bool) (int, error)
 }
 
-// Delegater employs a Doer to complete tasks
+// Delegator employs a Doer to complete tasks
 type Delegator struct {
 	Delegate Doer
 	Repeater

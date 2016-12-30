@@ -7,6 +7,7 @@ import (
 	fm "github.com/enocom/fm/lib"
 )
 
+// Version designates the currently released version of fm
 const Version = "1.1.0"
 
 func main() {
