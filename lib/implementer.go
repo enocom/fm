@@ -27,7 +27,7 @@ func (s *SpyFuncImplementer) Implement(t *ast.TypeSpec, i *ast.InterfaceType) []
 	for _, list := range i.Methods.List {
 		recv := &ast.FieldList{
 			List: []*ast.Field{
-				&ast.Field{
+				{
 					Names: []*ast.Ident{ast.NewIdent(recvName)},
 					Type:  &ast.StarExpr{X: t.Name},
 				},
