@@ -7,6 +7,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -37,7 +38,7 @@ func (c *Cmd) Run() {
 	}
 
 	for pname, p := range pkgs {
-		spyFile, err := os.Create(c.Dst)
+		spyFile, err := os.Create(path.Join(c.Wd, c.Dst))
 		if err != nil {
 			fatal(err)
 		}

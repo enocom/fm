@@ -7,10 +7,20 @@ import (
 	fm "github.com/enocom/fm/lib"
 )
 
-const Version = "1.0.0"
+const Version = "1.1.0"
 
 func main() {
 	printVersion := flag.Bool("version", false, "Print version and exit")
+	outputFilename := flag.String(
+		"out",
+		"spy_test",
+		"Name of output file with generated spies",
+	)
+	workingDir := flag.String(
+		"dir",
+		".",
+		"Directory to search for interfaces",
+	)
 	flag.Parse()
 
 	if *printVersion {
@@ -22,6 +32,6 @@ func main() {
 	impl := &fm.SpyFuncImplementer{}
 	g := &fm.SpyGenerator{Conv: conv, Impl: impl}
 
-	c := &fm.Cmd{Wd: ".", Dst: "spy_test.go", Gen: g}
+	c := &fm.Cmd{Wd: *workingDir, Dst: *outputFilename + ".go", Gen: g}
 	c.Run()
 }
