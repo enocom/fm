@@ -14,3 +14,6 @@ Writing a spy generator is the "Hello, World!" of AST parsing and generating in 
 - support embedded interfaces
 - update import paths when necessary
 - add comment to generated code identifying it as such
+- add go report card
+- add ci
+- add docs
