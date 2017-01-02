@@ -31,8 +31,7 @@ type Cmd struct {
 // the declaration generator. The result of the generator is then written
 // to the designated destination with *_test.go as the new package name
 func (c *Cmd) Run() {
-	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, c.Wd, isSrcFile, 0)
+	pkgs, err := parser.ParseDir(token.NewFileSet(), c.Wd, isSrcFile, 0)
 	if err != nil {
 		fatal(err)
 	}
@@ -54,7 +53,7 @@ func (c *Cmd) Run() {
 			Decls: decls,
 		}
 
-		format.Node(spyFile, fset, astFile)
+		format.Node(spyFile, token.NewFileSet(), astFile)
 	}
 }
 
