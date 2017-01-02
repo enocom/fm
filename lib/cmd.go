@@ -14,7 +14,7 @@ const (
 
 // Cmd coordinates between a parser, a generator, and a file writer.
 // It passes a parsed AST to the generator which produces an AST of spies
-// from the original AST, and then passes the generated AST to a the file
+// from the original AST, and then passes the generated AST to the file
 // writer, which saves the result to disk in the form of regular Go code.
 type Cmd struct {
 	DeclGenerator
