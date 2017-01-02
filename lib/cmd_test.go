@@ -24,6 +24,7 @@ func TestRunWritesToFile(t *testing.T) {
 	cmd := &fm.Cmd{
 		Gen: buildGen(),
 		Psr: &fm.SrcFileParser{},
+		Wrt: &fm.DiskASTWriter{},
 	}
 	cmd.Run(wd, "sample_test")
 

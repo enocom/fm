@@ -3,8 +3,6 @@ package fm
 import (
 	"fmt"
 	"go/ast"
-	"go/format"
-	"go/token"
 	"os"
 	"path"
 )
@@ -21,6 +19,7 @@ const (
 type Cmd struct {
 	Gen DeclGenerator
 	Psr Parser
+	Wrt ASTWriter
 }
 
 // Run parses the ast within the working directory and passes it to
@@ -45,11 +44,8 @@ func (c *Cmd) Run(directory, outputFilename string) {
 		}
 
 		// TODO: ensure go extension is added only when necessary
-		spyFile, err := os.Create(path.Join(directory, outputFilename+".go"))
-		if err != nil {
-			fatal(err) // TODO: return error
-		}
-		format.Node(spyFile, token.NewFileSet(), astFile)
+		// TODO: return error
+		c.Wrt.Write(astFile, path.Join(directory, outputFilename+".go"))
 	}
 }
 

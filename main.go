@@ -33,6 +33,6 @@ func main() {
 	impl := &fm.SpyFuncImplementer{}
 	g := &fm.SpyGenerator{Conv: conv, Impl: impl}
 
-	c := &fm.Cmd{Gen: g, Psr: &fm.SrcFileParser{}}
+	c := &fm.Cmd{Gen: g, Psr: &fm.SrcFileParser{}, Wrt: &fm.DiskASTWriter{}}
 	c.Run(*workingDir, *outputFilename)
 }
