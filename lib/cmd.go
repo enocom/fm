@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"go/ast"
 	"go/format"
-	"go/parser"
 	"go/token"
 	"os"
 	"path"
-	"strings"
 )
 
 const (
@@ -25,13 +23,14 @@ type Cmd struct {
 	Wd  string
 	Dst string
 	Gen DeclGenerator
+	Psr Parser
 }
 
 // Run parses the ast within the working directory and passes it to
 // the declaration generator. The result of the generator is then written
 // to the designated destination with *_test.go as the new package name
 func (c *Cmd) Run() {
-	pkgs, err := parser.ParseDir(token.NewFileSet(), c.Wd, isSrcFile, 0)
+	pkgs, err := c.Psr.ParseDir(c.Wd)
 	if err != nil {
 		fatal(err)
 	}
@@ -55,11 +54,6 @@ func (c *Cmd) Run() {
 
 		format.Node(spyFile, token.NewFileSet(), astFile)
 	}
-}
-
-// isSrcFile is an ast.Filter which removes all test files
-func isSrcFile(info os.FileInfo) bool {
-	return !strings.HasSuffix(info.Name(), "_test.go")
 }
 
 func fatal(err error) {

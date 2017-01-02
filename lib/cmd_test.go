@@ -21,7 +21,12 @@ func TestRunWritesToFile(t *testing.T) {
 		t.Fatalf("writeTmpFile failed with %v", err)
 	}
 
-	cmd := &fm.Cmd{Wd: wd, Dst: "sample_test.go", Gen: buildGen()}
+	cmd := &fm.Cmd{
+		Wd:  wd,
+		Dst: "sample_test.go",
+		Gen: buildGen(),
+		Psr: &fm.SrcFileParser{},
+	}
 	cmd.Run()
 
 	f, err := os.Open(path.Join(wd, "sample_test.go"))
