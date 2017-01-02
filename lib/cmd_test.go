@@ -26,7 +26,7 @@ func TestRunWritesToFile(t *testing.T) {
 		Parser:        &fm.SrcFileParser{},
 		FileWriter:    &fm.DiskFileWriter{},
 	}
-	cmd.Run(wd, "sample_test")
+	cmd.Run(wd, "sample_test.go")
 
 	f, err := os.Open(path.Join(wd, "sample_test.go"))
 	if err != nil {
@@ -57,7 +57,7 @@ func TestRunReturnsErrorWhenParseFails(t *testing.T) {
 		FileWriter:    nil,
 	}
 
-	err := cmd.Run("", "sample_test")
+	err := cmd.Run("", "sample_test.go")
 
 	want := expectedError
 	got := err
@@ -88,7 +88,7 @@ func TestRunReturnsErrorWhenWriteFails(t *testing.T) {
 		FileWriter:    spyFileWriter,
 	}
 
-	err := cmd.Run("", "sample_test")
+	err := cmd.Run("", "sample_test.go")
 
 	want := expectedError
 	got := err

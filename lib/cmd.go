@@ -44,7 +44,7 @@ func (c *Cmd) Run(directory, outputFilename string) error {
 		}
 
 		// TODO: ensure go extension is added only when necessary
-		err = c.Write(astFile, path.Join(directory, outputFilename+".go"))
+		err = c.Write(astFile, path.Join(directory, outputFilename))
 		if err != nil {
 			return err
 		}

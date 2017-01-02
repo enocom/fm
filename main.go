@@ -15,7 +15,7 @@ func main() {
 	printVersion := flag.Bool("version", false, "Print version and exit")
 	outputFilename := flag.String(
 		"out",
-		"spy_test",
+		"fm_test.go",
 		"Name of output file with generated spies",
 	)
 	workingDir := flag.String(
