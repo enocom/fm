@@ -7,16 +7,17 @@ import (
 	"os"
 )
 
-// ASTWriter writes the ast.File to the provided filename
-type ASTWriter interface {
+// FileWriter writes the ast.File to the provided filename
+type FileWriter interface {
 	Write(file *ast.File, filename string) error
 }
 
-// DiskASTWriter saves an AST to disk
-type DiskASTWriter struct{}
+// DiskFileWriter formats an ast.File as a standard go file
+// and writes it to disk
+type DiskFileWriter struct{}
 
 // Write outputs the ast.File to a file on disk specified by filename
-func (d *DiskASTWriter) Write(file *ast.File, filename string) error {
+func (d *DiskFileWriter) Write(file *ast.File, filename string) error {
 	spyFile, err := os.Create(filename)
 	if err != nil {
 		return err

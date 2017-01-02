@@ -19,7 +19,7 @@ const (
 type Cmd struct {
 	Gen DeclGenerator
 	Psr Parser
-	Wrt ASTWriter
+	Wrt FileWriter
 }
 
 // Run parses the ast within the working directory and passes it to
