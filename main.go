@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	fm "github.com/enocom/fm/lib"
 )
@@ -37,5 +38,9 @@ func main() {
 		FileWriter:    &fm.DiskFileWriter{},
 	}
 
-	c.Run(*workingDir, *outputFilename)
+	err := c.Run(*workingDir, *outputFilename)
+	if err != nil {
+		fmt.Printf("Error %v\n", err)
+		os.Exit(1)
+	}
 }

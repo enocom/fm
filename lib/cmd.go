@@ -1,9 +1,7 @@
 package fm
 
 import (
-	"fmt"
 	"go/ast"
-	"os"
 	"path"
 )
 
@@ -53,9 +51,4 @@ func (c *Cmd) Run(directory, outputFilename string) error {
 	}
 
 	return nil
-}
-
-func fatal(err error) {
-	fmt.Printf("Error %v\n", err)
-	os.Exit(1)
 }
