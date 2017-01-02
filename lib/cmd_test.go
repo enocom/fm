@@ -22,12 +22,10 @@ func TestRunWritesToFile(t *testing.T) {
 	}
 
 	cmd := &fm.Cmd{
-		Wd:  wd,
-		Dst: "sample_test.go",
 		Gen: buildGen(),
 		Psr: &fm.SrcFileParser{},
 	}
-	cmd.Run()
+	cmd.Run(wd, "sample_test")
 
 	f, err := os.Open(path.Join(wd, "sample_test.go"))
 	if err != nil {

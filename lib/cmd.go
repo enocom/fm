@@ -16,12 +16,9 @@ const (
 	retPrefix    = "Ret"
 )
 
-// Cmd passes all declarations found within the working directory to
-// the declaration generator, and writes the output to the filename
-// specified by Dst
+// Cmd coordinates between a parser and generator. It passes a parsed AST
+// to the generator and then writes the generated code to disk.
 type Cmd struct {
-	Wd  string
-	Dst string
 	Gen DeclGenerator
 	Psr Parser
 }
@@ -29,10 +26,10 @@ type Cmd struct {
 // Run parses the ast within the working directory and passes it to
 // the declaration generator. The result of the generator is then written
 // to the designated destination with *_test.go as the new package name
-func (c *Cmd) Run() {
-	pkgs, err := c.Psr.ParseDir(c.Wd)
+func (c *Cmd) Run(directory, outputFilename string) {
+	pkgs, err := c.Psr.ParseDir(directory)
 	if err != nil {
-		fatal(err)
+		fatal(err) // TODO: return error
 	}
 
 	for pname, p := range pkgs {
@@ -47,9 +44,10 @@ func (c *Cmd) Run() {
 			Decls: decls,
 		}
 
-		spyFile, err := os.Create(path.Join(c.Wd, c.Dst))
+		// TODO: ensure go extension is added only when necessary
+		spyFile, err := os.Create(path.Join(directory, outputFilename+".go"))
 		if err != nil {
-			fatal(err)
+			fatal(err) // TODO: return error
 		}
 		format.Node(spyFile, token.NewFileSet(), astFile)
 	}
