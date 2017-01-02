@@ -14,21 +14,23 @@ const (
 	retPrefix    = "Ret"
 )
 
-// Cmd coordinates between a parser and generator. It passes a parsed AST
-// to the generator and then writes the generated code to disk.
+// Cmd coordinates between a parser, a generator, and a file writer.
+// It passes a parsed AST to the generator which produces an AST of spies
+// from the original AST, and then passes the generated AST to a the file
+// writer, which saves the result to disk in the form of regular Go code.
 type Cmd struct {
 	DeclGenerator
 	Parser
 	FileWriter
 }
 
-// Run parses the ast within the working directory and passes it to
+// Run parses the AST within the working directory and passes it to
 // the declaration generator. The result of the generator is then written
 // to the designated destination with *_test.go as the new package name
-func (c *Cmd) Run(directory, outputFilename string) {
+func (c *Cmd) Run(directory, outputFilename string) error {
 	pkgs, err := c.ParseDir(directory)
 	if err != nil {
-		fatal(err) // TODO: return error
+		return err
 	}
 
 	for pname, p := range pkgs {
@@ -44,9 +46,13 @@ func (c *Cmd) Run(directory, outputFilename string) {
 		}
 
 		// TODO: ensure go extension is added only when necessary
-		// TODO: return error
-		c.Write(astFile, path.Join(directory, outputFilename+".go"))
+		err = c.Write(astFile, path.Join(directory, outputFilename+".go"))
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 func fatal(err error) {

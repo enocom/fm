@@ -1,6 +1,8 @@
 package fm_test
 
 import (
+	"errors"
+	"go/ast"
 	"io/ioutil"
 	"os"
 	"path"
@@ -10,12 +12,10 @@ import (
 	fm "github.com/enocom/fm/lib"
 )
 
-var sampleCode string = `package sample`
-
 // TestRunWritesToFile is an integration test which ensures Cmd.Run
 // reads from disk, generates spies, and writes the result back out
 func TestRunWritesToFile(t *testing.T) {
-	wd, err, rmTempFile := writeTmpFile(sampleCode)
+	wd, err, rmTempFile := writeTmpFile("package sample")
 	defer rmTempFile()
 	if err != nil {
 		t.Fatalf("writeTmpFile failed with %v", err)
@@ -37,8 +37,61 @@ func TestRunWritesToFile(t *testing.T) {
 		t.Fatalf("ReadAll failed with %v", err)
 	}
 
-	want := `package sample_test`
+	want := "package sample_test"
 	got := strings.TrimSpace(string(bytes))
+
+	if want != got {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
+// TestRunReturnsErrorWhenParseFails ensures the parse error is
+// returned to the caller
+func TestRunReturnsErrorWhenParseFails(t *testing.T) {
+	spyParser := &SpyParser{}
+	expectedError := errors.New("parse failed")
+	spyParser.ParseDir_Output.Ret1 = expectedError
+	cmd := &fm.Cmd{
+		Parser:        spyParser,
+		DeclGenerator: nil,
+		FileWriter:    nil,
+	}
+
+	err := cmd.Run("", "sample_test")
+
+	want := expectedError
+	got := err
+
+	if want != got {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
+// TestRunReturnsErrorWhenWriteFails ensures any failure of writing
+// immediately results in an error return value
+func TestRunReturnsErrorWhenWriteFails(t *testing.T) {
+	spyParser := &SpyParser{}
+	spyParser.ParseDir_Output.Ret0 = map[string]*ast.Package{
+		"bogus": &ast.Package{
+			Name:  "bogus",
+			Files: make(map[string]*ast.File),
+		},
+	}
+	spyParser.ParseDir_Output.Ret1 = nil
+	spyFileWriter := &SpyFileWriter{}
+	expectedError := errors.New("write failed")
+	spyFileWriter.Write_Output.Ret0 = expectedError
+
+	cmd := &fm.Cmd{
+		Parser:        spyParser,
+		DeclGenerator: nil,
+		FileWriter:    spyFileWriter,
+	}
+
+	err := cmd.Run("", "sample_test")
+
+	want := expectedError
+	got := err
 
 	if want != got {
 		t.Errorf("want %v, got %v", want, got)
