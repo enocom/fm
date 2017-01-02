@@ -1,7 +1,7 @@
 language: go
 sudo: false
 go:
-  - tip
+  - master
 install:
   - go get -v github.com/golang/lint/golint
   - go build -v ./...
