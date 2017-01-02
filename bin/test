@@ -13,7 +13,7 @@ function generate_spies {
 }
 
 function run_tests {
-    go test ./...
+    go test -v ./...
 }
 
 function main {
