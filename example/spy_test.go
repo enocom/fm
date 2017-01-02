@@ -1,24 +1,5 @@
 package example_test
 
-type SpyRepeater struct {
-	Repeat_Called bool
-	Repeat_Input  struct {
-		Arg0 string
-		Arg1 string
-	}
-	Repeat_Output struct {
-		Ret0 int
-		Ret1 error
-	}
-}
-
-func (f *SpyRepeater) Repeat(task, rationale string) (count int, err error) {
-	f.Repeat_Called = true
-	f.Repeat_Input.Arg0 = task
-	f.Repeat_Input.Arg1 = rationale
-	return f.Repeat_Output.Ret0, f.Repeat_Output.Ret1
-}
-
 type SpyDoer struct {
 	DoIt_Called bool
 	DoIt_Input  struct {
@@ -36,4 +17,23 @@ func (f *SpyDoer) DoIt(task string, graciously bool) (int, error) {
 	f.DoIt_Input.Arg0 = task
 	f.DoIt_Input.Arg1 = graciously
 	return f.DoIt_Output.Ret0, f.DoIt_Output.Ret1
+}
+
+type SpyRepeater struct {
+	Repeat_Called bool
+	Repeat_Input  struct {
+		Arg0 string
+		Arg1 string
+	}
+	Repeat_Output struct {
+		Ret0 int
+		Ret1 error
+	}
+}
+
+func (f *SpyRepeater) Repeat(task, rationale string) (count int, err error) {
+	f.Repeat_Called = true
+	f.Repeat_Input.Arg0 = task
+	f.Repeat_Input.Arg1 = rationale
+	return f.Repeat_Output.Ret0, f.Repeat_Output.Ret1
 }
