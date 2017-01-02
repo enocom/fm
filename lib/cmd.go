@@ -36,11 +36,6 @@ func (c *Cmd) Run() {
 	}
 
 	for pname, p := range pkgs {
-		spyFile, err := os.Create(path.Join(c.Wd, c.Dst))
-		if err != nil {
-			fatal(err)
-		}
-
 		var decls []ast.Decl
 		for _, f := range p.Files {
 			spyDecls := c.Gen.Generate(f.Decls)
@@ -52,6 +47,10 @@ func (c *Cmd) Run() {
 			Decls: decls,
 		}
 
+		spyFile, err := os.Create(path.Join(c.Wd, c.Dst))
+		if err != nil {
+			fatal(err)
+		}
 		format.Node(spyFile, token.NewFileSet(), astFile)
 	}
 }
