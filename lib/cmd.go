@@ -17,16 +17,16 @@ const (
 // Cmd coordinates between a parser and generator. It passes a parsed AST
 // to the generator and then writes the generated code to disk.
 type Cmd struct {
-	Gen DeclGenerator
-	Psr Parser
-	Wrt FileWriter
+	DeclGenerator
+	Parser
+	FileWriter
 }
 
 // Run parses the ast within the working directory and passes it to
 // the declaration generator. The result of the generator is then written
 // to the designated destination with *_test.go as the new package name
 func (c *Cmd) Run(directory, outputFilename string) {
-	pkgs, err := c.Psr.ParseDir(directory)
+	pkgs, err := c.ParseDir(directory)
 	if err != nil {
 		fatal(err) // TODO: return error
 	}
@@ -34,7 +34,7 @@ func (c *Cmd) Run(directory, outputFilename string) {
 	for pname, p := range pkgs {
 		var decls []ast.Decl
 		for _, f := range p.Files {
-			spyDecls := c.Gen.Generate(f.Decls)
+			spyDecls := c.Generate(f.Decls)
 			decls = append(decls, spyDecls...)
 		}
 
@@ -45,7 +45,7 @@ func (c *Cmd) Run(directory, outputFilename string) {
 
 		// TODO: ensure go extension is added only when necessary
 		// TODO: return error
-		c.Wrt.Write(astFile, path.Join(directory, outputFilename+".go"))
+		c.Write(astFile, path.Join(directory, outputFilename+".go"))
 	}
 }
 

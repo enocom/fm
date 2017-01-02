@@ -31,8 +31,11 @@ func main() {
 
 	conv := &fm.SpyStructConverter{}
 	impl := &fm.SpyFuncImplementer{}
-	g := &fm.SpyGenerator{Conv: conv, Impl: impl}
+	c := &fm.Cmd{
+		DeclGenerator: &fm.SpyGenerator{Conv: conv, Impl: impl},
+		Parser:        &fm.SrcFileParser{},
+		FileWriter:    &fm.DiskFileWriter{},
+	}
 
-	c := &fm.Cmd{Gen: g, Psr: &fm.SrcFileParser{}, Wrt: &fm.DiskFileWriter{}}
 	c.Run(*workingDir, *outputFilename)
 }
