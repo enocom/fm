@@ -1,4 +1,4 @@
-# fm [![Travis CI](https://travis-ci.org/enocom/fm)] [![Go Report Card](https://goreportcard.com/badge/github.com/enocom/fm)](https://goreportcard.com/report/github.com/enocom/fm) [![GoDoc](https://godoc.org/github.com/enocom/fm?status.svg)](https://godoc.org/github.com/enocom/fm)
+# fm [![Build Status](https://secure.travis-ci.org/enocom/fm.png)](http://travis-ci.org/enocom/fm) [![Go Report Card](https://goreportcard.com/badge/github.com/enocom/fm)](https://goreportcard.com/report/github.com/enocom/fm) [![GoDoc](https://godoc.org/github.com/enocom/fm?status.svg)](https://godoc.org/github.com/enocom/fm)
 
 The letters `fm` are short for the Chinese word _fangmao_ 仿冒, which literally means "to imitate and obscure", or "counterfeit." It is also a tool written in Go for generating spy implementations of interfaces.
 
