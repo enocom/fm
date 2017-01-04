@@ -2,7 +2,7 @@ package fm
 
 import "go/ast"
 
-// DeclGenerator creates a new slice of ast.Decl based on the input
+// DeclGenerator creates a new slice of ast declarations based on the input
 type DeclGenerator interface {
 	Generate(ds []ast.Decl) []ast.Decl
 }

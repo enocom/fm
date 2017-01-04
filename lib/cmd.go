@@ -25,7 +25,7 @@ type Cmd struct {
 
 // Run parses the AST within the working directory and passes it to
 // the declaration generator. The result of the generator is then written
-// to the designated destination with *_test.go as the new package name
+// to the designated destination with *_test as the new package name
 func (c *Cmd) Run(directory, outputFilename string) error {
 	pkgs, err := c.ParseDir(directory)
 	if err != nil {
