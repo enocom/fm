@@ -98,6 +98,34 @@ func TestRunReturnsErrorWhenWriteFails(t *testing.T) {
 	}
 }
 
+// TestRunAddsGoSuffix ensures the output file name has ".go" appended to it
+func TestRunAddsGoSuffix(t *testing.T) {
+	spyParser := &SpyParser{}
+	spyParser.ParseDir_Output.Ret0 = map[string]*ast.Package{
+		"bogus": &ast.Package{
+			Name:  "bogus",
+			Files: make(map[string]*ast.File),
+		},
+	}
+	spyParser.ParseDir_Output.Ret1 = nil
+	spyFileWriter := &SpyFileWriter{}
+
+	cmd := &fm.Cmd{
+		Parser:        spyParser,
+		DeclGenerator: nil,
+		FileWriter:    spyFileWriter,
+	}
+
+	cmd.Run("", "sample_test")
+
+	want := "sample_test.go"
+	got := spyFileWriter.Write_Input.Arg1
+
+	if want != got {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
 func writeTmpFile(code string) (string, error, func()) {
 	dir, err := ioutil.TempDir("", "")
 	if err != nil {

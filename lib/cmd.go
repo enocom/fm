@@ -3,6 +3,7 @@ package fm
 import (
 	"go/ast"
 	"path"
+	"strings"
 )
 
 const (
@@ -43,7 +44,9 @@ func (c *Cmd) Run(directory, outputFilename string) error {
 			Decls: decls,
 		}
 
-		// TODO: ensure go extension is added only when necessary
+		if !strings.HasSuffix(outputFilename, ".go") {
+			outputFilename += ".go"
+		}
 		err = c.Write(astFile, path.Join(directory, outputFilename))
 		if err != nil {
 			return err
