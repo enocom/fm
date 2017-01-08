@@ -33,7 +33,7 @@ func main() {
 	conv := &fm.SpyStructConverter{}
 	impl := &fm.SpyFuncImplementer{}
 	c := &fm.Cmd{
-		DeclGenerator: &fm.SpyGenerator{Conv: conv, Impl: impl},
+		DeclGenerator: &fm.SpyGenerator{Converter: conv, Implementer: impl},
 		Parser:        &fm.SrcFileParser{},
 		FileWriter:    &fm.DiskFileWriter{},
 	}
