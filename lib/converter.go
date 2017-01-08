@@ -60,9 +60,11 @@ func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast
 // buildInputStruct writes a struct type whose fields
 // reflect the various input arguments defined in the interface
 func buildStruct(fieldname, prefix string, list []*ast.Field) *ast.Field {
-	var fields []*ast.Field
-	var argOffset int
-	var argName string
+	var (
+		fields    []*ast.Field
+		argOffset int
+		argName   string
+	)
 
 	for idx, param := range list {
 		// if we have multiple arguments of the same type,
