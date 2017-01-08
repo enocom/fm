@@ -149,7 +149,7 @@ func writeTmpFile(code string) (string, error, func()) {
 
 func buildGen() fm.DeclGenerator {
 	return &fm.SpyGenerator{
-		Conv: &fm.SpyStructConverter{},
-		Impl: &fm.SpyFuncImplementer{},
+		Converter:   &fm.SpyStructConverter{},
+		Implementer: &fm.SpyFuncImplementer{},
 	}
 }
