@@ -2,6 +2,7 @@ package fm_test
 
 import (
 	"go/ast"
+	"go/token"
 	"testing"
 
 	fm "github.com/enocom/fm/lib"
@@ -27,12 +28,47 @@ func TestGenerateReturnsSliceOfSpyDecls(t *testing.T) {
 	}
 }
 
-func TestGenerateSkipsAnythingButInterfaceTypes(t *testing.T) {
+// e.g., ast.FuncDecl
+func TestGenerateSkipsDeclsThatAreNotGenDecls(t *testing.T) {
 	gen := &fm.SpyGenerator{
 		Converter:   &fm.SpyStructConverter{},
 		Implementer: &fm.SpyFuncImplementer{},
 	}
-	decls := buildASTWithoutInterfaces()
+	decls := buildFuncDeclAST()
+	spyDecls := gen.Generate(decls)
+
+	want := 0
+	got := len(spyDecls)
+
+	if want != got {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
+// e.g., ast.ValueSpec
+func TestGenerateSkipsSpecsThatAreNotTypeSpecs(t *testing.T) {
+	gen := &fm.SpyGenerator{
+		Converter:   &fm.SpyStructConverter{},
+		Implementer: &fm.SpyFuncImplementer{},
+	}
+	decls := buildValueSpecAST()
+	spyDecls := gen.Generate(decls)
+
+	want := 0
+	got := len(spyDecls)
+
+	if want != got {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
+// e.g., ast.StructType
+func TestGenerateSkipsTypeSpecsThatAreNotInterfaceTypes(t *testing.T) {
+	gen := &fm.SpyGenerator{
+		Converter:   &fm.SpyStructConverter{},
+		Implementer: &fm.SpyFuncImplementer{},
+	}
+	decls := buildStructAST()
 	spyDecls := gen.Generate(decls)
 
 	want := 0
@@ -56,13 +92,13 @@ func TestGenerateReturnsEmptySliceForNoInput(t *testing.T) {
 	}
 }
 
-// buildTestAST generates as AST for the following interface:
+// buildTestAST generates as AST of the following code:
 //
 // type Tester interface {
 //     Test()
 // }
 func buildInterfaceAST() []ast.Decl {
-	fields := make([]*ast.Field, 0)
+	var fields []*ast.Field
 	fields = append(fields, &ast.Field{
 		Names: []*ast.Ident{ast.NewIdent("Test")},
 		Type: &ast.FuncType{
@@ -71,7 +107,7 @@ func buildInterfaceAST() []ast.Decl {
 		},
 	})
 
-	decls := make([]ast.Decl, 0)
+	var decls []ast.Decl
 	decls = append(decls, &ast.GenDecl{
 		Specs: []ast.Spec{
 			&ast.TypeSpec{
@@ -88,11 +124,11 @@ func buildInterfaceAST() []ast.Decl {
 	return decls
 }
 
-// buildASTWithoutInterfaces generates as AST of the following code:
+// buildStructAST generates as AST of the following code:
 //
 // type Tester struct {}
-func buildASTWithoutInterfaces() []ast.Decl {
-	decls := make([]ast.Decl, 0)
+func buildStructAST() []ast.Decl {
+	var decls []ast.Decl
 	decls = append(decls, &ast.GenDecl{
 		Specs: []ast.Spec{
 			&ast.TypeSpec{
@@ -101,6 +137,48 @@ func buildASTWithoutInterfaces() []ast.Decl {
 					Fields: &ast.FieldList{
 						List: make([]*ast.Field, 0),
 					},
+				},
+			},
+		},
+	})
+
+	return decls
+}
+
+// buildStructAST generates an AST of the followign code:
+//
+// func foobar() {}
+func buildFuncDeclAST() []ast.Decl {
+	var decls []ast.Decl
+	decls = append(decls, &ast.FuncDecl{
+		Recv: nil,
+		Name: ast.NewIdent("foobar"),
+		Type: &ast.FuncType{
+			Params: &ast.FieldList{
+				List: make([]*ast.Field, 0),
+			},
+			Results: nil,
+		},
+		Body: &ast.BlockStmt{
+			List: nil,
+		},
+	})
+
+	return decls
+}
+
+// buildValueSpecAST generates an AST of the following code:
+//
+// var foobar string
+func buildValueSpecAST() []ast.Decl {
+	var decls []ast.Decl
+	decls = append(decls, &ast.GenDecl{
+		Tok: token.VAR,
+		Specs: []ast.Spec{
+			&ast.ValueSpec{
+				Names: []*ast.Ident{
+					ast.NewIdent("foobar"),
+					ast.NewIdent("string"),
 				},
 			},
 		},
