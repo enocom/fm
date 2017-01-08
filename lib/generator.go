@@ -23,26 +23,32 @@ func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 			continue
 		}
 
-		for _, spec := range genDecl.Specs {
-			typeSpec, ok := spec.(*ast.TypeSpec)
-			if !ok {
-				continue
-			}
+		if len(genDecl.Specs) != 1 {
+			continue // TODO: would this ever happen?
+		}
 
-			interfaceType, ok := typeSpec.Type.(*ast.InterfaceType)
-			if !ok {
-				continue
-			}
+		spec := genDecl.Specs[0]
+		typeSpec, ok := spec.(*ast.TypeSpec)
+		if !ok {
+			continue
+		}
 
-			// TODO: stop mutating typeSpec
-			g.Converter.Convert(typeSpec, interfaceType)
-			funcDecls := g.Implementer.Implement(typeSpec, interfaceType)
+		interfaceType, ok := typeSpec.Type.(*ast.InterfaceType)
+		if !ok {
+			continue
+		}
 
-			decls = append(decls, genDecl)
-			for _, fd := range funcDecls {
-				decls = append(decls, fd)
-			}
+		structTypeSpec := g.Converter.Convert(typeSpec, interfaceType)
+		decls = append(decls, &ast.GenDecl{
+			Tok:   genDecl.Tok,
+			Specs: []ast.Spec{structTypeSpec},
+		})
+
+		funcDecls := g.Implementer.Implement(structTypeSpec, interfaceType)
+		for _, fd := range funcDecls {
+			decls = append(decls, fd)
 		}
 	}
+
 	return decls
 }

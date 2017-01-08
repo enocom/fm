@@ -21,8 +21,6 @@ type SpyStructConverter struct{}
 // Convert mutates the ast.TypeSpec into a struct type with public properties
 // for all parameters and all return values declared in the interface
 func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
-	t.Name = ast.NewIdent(spyPrefix + t.Name.Name)
-
 	var list []*ast.Field
 	for _, field := range i.Methods.List {
 		funcType, ok := field.Type.(*ast.FuncType)
@@ -50,12 +48,13 @@ func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast
 		}
 	}
 
-	t.Type = &ast.StructType{
-		Fields:     &ast.FieldList{List: list},
-		Incomplete: i.Incomplete,
+	return &ast.TypeSpec{
+		Name: ast.NewIdent(spyPrefix + t.Name.Name),
+		Type: &ast.StructType{
+			Fields:     &ast.FieldList{List: list},
+			Incomplete: i.Incomplete,
+		},
 	}
-
-	return t
 }
 
 // buildInputStruct writes a struct type whose fields
