@@ -25,6 +25,10 @@ func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast
 	for _, field := range i.Methods.List {
 		funcType, ok := field.Type.(*ast.FuncType)
 		if !ok {
+			continue
+		}
+
+		if len(field.Names) != 1 {
 			continue // TODO: when would this happen?
 		}
 
@@ -51,8 +55,7 @@ func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast
 	return &ast.TypeSpec{
 		Name: ast.NewIdent(spyPrefix + t.Name.Name),
 		Type: &ast.StructType{
-			Fields:     &ast.FieldList{List: list},
-			Incomplete: i.Incomplete,
+			Fields: &ast.FieldList{List: list},
 		},
 	}
 }
