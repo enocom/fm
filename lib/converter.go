@@ -46,7 +46,7 @@ func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast
 		}
 
 		// add Output struct with result values
-		if len(funcType.Results.List) > 0 {
+		if funcType.Results != nil && len(funcType.Results.List) > 0 {
 			outputStruct := buildStruct(methodName+outputSuffix, retPrefix, funcType.Results.List)
 			list = append(list, outputStruct)
 		}
