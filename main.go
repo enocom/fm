@@ -30,12 +30,13 @@ func main() {
 		return
 	}
 
-	conv := &fm.SpyStructConverter{}
-	impl := &fm.SpyFuncImplementer{}
 	c := &fm.Cmd{
-		DeclGenerator: &fm.SpyGenerator{Converter: conv, Implementer: impl},
-		Parser:        &fm.SrcFileParser{},
-		FileWriter:    &fm.DiskFileWriter{},
+		DeclGenerator: &fm.SpyGenerator{
+			Converter:   &fm.SpyStructConverter{},
+			Implementer: &fm.SpyFuncImplementer{},
+		},
+		Parser:     &fm.SrcFileParser{},
+		FileWriter: &fm.DiskFileWriter{},
 	}
 
 	err := c.Run(*workingDir, *outputFilename)
