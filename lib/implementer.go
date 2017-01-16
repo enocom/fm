@@ -13,7 +13,7 @@ const (
 // FuncImplementer accepts an interface and returns implementations
 // of its functions
 type FuncImplementer interface {
-	Implement(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl
+	Implement(name *ast.Ident, i *ast.InterfaceType) []*ast.FuncDecl
 }
 
 // SpyFuncImplementer creates spy implementations of an interface's functions.
@@ -22,14 +22,14 @@ type SpyFuncImplementer struct{}
 
 // Implement returns a function declaration whose arguments are saved
 // as properties and whose return values are properties on a spy struct
-func (s *SpyFuncImplementer) Implement(t *ast.TypeSpec, i *ast.InterfaceType) []*ast.FuncDecl {
+func (s *SpyFuncImplementer) Implement(name *ast.Ident, i *ast.InterfaceType) []*ast.FuncDecl {
 	var funcDecls []*ast.FuncDecl
 	for _, list := range i.Methods.List {
 		recv := &ast.FieldList{
 			List: []*ast.Field{
 				{
 					Names: []*ast.Ident{ast.NewIdent(recvName)},
-					Type:  &ast.StarExpr{X: t.Name},
+					Type:  &ast.StarExpr{X: name},
 				},
 			},
 		}
@@ -44,13 +44,13 @@ func (s *SpyFuncImplementer) Implement(t *ast.TypeSpec, i *ast.InterfaceType) []
 			Recv: recv,
 			Name: list.Names[0],
 			Type: funcType,
-			Body: createBlockStmt(t, list.Names[0].Name, funcType),
+			Body: createBlockStmt(list.Names[0].Name, funcType),
 		})
 	}
 	return funcDecls
 }
 
-func createBlockStmt(t *ast.TypeSpec, fname string, f *ast.FuncType) *ast.BlockStmt {
+func createBlockStmt(fname string, f *ast.FuncType) *ast.BlockStmt {
 	var list []ast.Stmt
 
 	// add called assignment statement

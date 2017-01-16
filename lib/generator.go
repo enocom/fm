@@ -44,7 +44,7 @@ func (g *SpyGenerator) Generate(ds []ast.Decl) []ast.Decl {
 			Specs: []ast.Spec{structTypeSpec},
 		})
 
-		funcDecls := g.Implementer.Implement(structTypeSpec, interfaceType)
+		funcDecls := g.Implementer.Implement(structTypeSpec.Name, interfaceType)
 		for _, fd := range funcDecls {
 			decls = append(decls, fd)
 		}
