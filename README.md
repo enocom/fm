@@ -1,4 +1,4 @@
-# fm [![Build Status](https://travis-ci.org/enocom/fm.svg?branch=master)](https://travis-ci.org/enocom/fm) [![Go Report Card](https://goreportcard.com/badge/github.com/enocom/fm)](https://goreportcard.com/report/github.com/enocom/fm) [![GoDoc](https://godoc.org/github.com/enocom/fm?status.svg)](https://godoc.org/github.com/enocom/fm)
+
 
 The letters `fm` are short for the Chinese word _fangmao_ 仿冒, which literally means "to imitate and obscure", or "counterfeit." It is also a tool written in Go for generating spy implementations of interfaces.
 
@@ -10,8 +10,6 @@ Writing a spy generator is the "Hello, World!" of AST parsing and generating in 
 
 ## TODO
 
-- add unit tests
 - support embedded interfaces
 - update import paths when necessary
 - add comment to generated code identifying it as such
-- dogfood fm in unit tests
