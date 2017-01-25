@@ -26,12 +26,10 @@ func (s *SpyFuncImplementer) Implement(name *ast.Ident, i *ast.InterfaceType) []
 	var funcDecls []*ast.FuncDecl
 	for _, list := range i.Methods.List {
 		recv := &ast.FieldList{
-			List: []*ast.Field{
-				{
-					Names: []*ast.Ident{ast.NewIdent(recvName)},
-					Type:  &ast.StarExpr{X: name},
-				},
-			},
+			List: []*ast.Field{{
+				Names: []*ast.Ident{ast.NewIdent(recvName)},
+				Type:  &ast.StarExpr{X: name},
+			}},
 		}
 
 		funcType, ok := list.Type.(*ast.FuncType)
@@ -62,9 +60,7 @@ func createBlockStmt(fname string, f *ast.FuncType) *ast.BlockStmt {
 			},
 		},
 		Tok: token.ASSIGN,
-		Rhs: []ast.Expr{
-			ast.NewIdent("true"),
-		},
+		Rhs: []ast.Expr{ast.NewIdent("true")},
 	}
 	list = append(list, calledStmt)
 
