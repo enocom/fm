@@ -24,7 +24,7 @@ func TestRunWritesToFile(t *testing.T) {
 	cmd := &fm.Cmd{
 		DeclGenerator: buildGen(),
 		Parser:        &fm.SrcFileParser{},
-		FileWriter:    &fm.DiskFileWriter{},
+		Writer:        &fm.FileWriter{},
 	}
 	cmd.Run(wd, "sample_test.go")
 
@@ -54,7 +54,7 @@ func TestRunReturnsErrorWhenParseFails(t *testing.T) {
 	cmd := &fm.Cmd{
 		Parser:        spyParser,
 		DeclGenerator: nil,
-		FileWriter:    nil,
+		Writer:        nil,
 	}
 
 	err := cmd.Run("", "sample_test.go")
@@ -85,7 +85,7 @@ func TestRunReturnsErrorWhenWriteFails(t *testing.T) {
 	cmd := &fm.Cmd{
 		Parser:        spyParser,
 		DeclGenerator: nil,
-		FileWriter:    spyFileWriter,
+		Writer:        spyFileWriter,
 	}
 
 	err := cmd.Run("", "sample_test.go")
@@ -113,7 +113,7 @@ func TestRunAddsGoSuffix(t *testing.T) {
 	cmd := &fm.Cmd{
 		Parser:        spyParser,
 		DeclGenerator: nil,
-		FileWriter:    spyFileWriter,
+		Writer:        spyFileWriter,
 	}
 
 	cmd.Run("", "sample_test")

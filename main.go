@@ -35,8 +35,8 @@ func main() {
 			Converter:   &fm.SpyStructConverter{},
 			Implementer: &fm.SpyFuncImplementer{},
 		},
-		Parser:     &fm.SrcFileParser{},
-		FileWriter: &fm.DiskFileWriter{},
+		Parser: &fm.SrcFileParser{},
+		Writer: &fm.FileWriter{},
 	}
 
 	err := c.Run(*workingDir, *outputFilename)

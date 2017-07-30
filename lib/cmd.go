@@ -13,6 +13,22 @@ const (
 	retPrefix    = "Ret"
 )
 
+// DeclGenerator creates a new slice of ast declarations based on the input
+type DeclGenerator interface {
+	Generate(ds []ast.Decl) []ast.Decl
+}
+
+// Parser is responsible for returning the ASTs of all files
+// within a directory
+type Parser interface {
+	ParseDir(dir string) (map[string]*ast.Package, error)
+}
+
+// Writer writes the ast.File to the provided filename
+type Writer interface {
+	Write(file *ast.File, filename string) error
+}
+
 // Cmd coordinates between a parser, a generator, and a file writer.
 // It passes a parsed AST to the generator which produces an AST of spies
 // from the original AST, and then passes the generated AST to the file
@@ -20,7 +36,7 @@ const (
 type Cmd struct {
 	DeclGenerator
 	Parser
-	FileWriter
+	Writer
 }
 
 // Run parses the AST within the working directory and passes it to

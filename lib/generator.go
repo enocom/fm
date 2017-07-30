@@ -2,11 +2,6 @@ package fm
 
 import "go/ast"
 
-// DeclGenerator creates a new slice of ast declarations based on the input
-type DeclGenerator interface {
-	Generate(ds []ast.Decl) []ast.Decl
-}
-
 // SpyGenerator creates spy implementations of interface declarations
 type SpyGenerator struct {
 	Converter   StructConverter
