@@ -6,10 +6,11 @@ The letters `fm` are short for the Chinese word _fangmao_ 仿冒, which literall
 
 ## Background
 
-Writing a spy generator is the "Hello, World!" of AST parsing and generating in Go. There are many full featured libraries that do the same thing and better. For example, see [Counterfeiter](https://github.com/maxbrunsfeld/counterfeiter), [Hel](https://github.com/nelsam/hel), or [GoMock](https://github.com/golang/mock). The code here represents my own minimalist approach to the problem of generating test doubles.
+Writing a spy generator is the "Hello, World!" of AST parsing and generating in Go. There are many full featured libraries that do the same thing and better. For example, see [Counterfeiter](https://github.com/maxbrunsfeld/counterfeiter), [Hel](https://github.com/nelsam/hel), or [GoMock](https://github.com/golang/mock). The code here represents my own minimalist approach to the problem of generating test doubles. Generally, I prefer writing spies by hand, which makes for simpler tests and one less dependency to manage. Less is more.
 
 ## TODO
 
 - support embedded interfaces
 - update import paths when necessary
+- Wrap fields in mutex for thread-safety
 - add comment to generated code identifying it as such
