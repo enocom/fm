@@ -9,11 +9,6 @@ const (
 	spyPrefix = "Spy"
 )
 
-// StructConverter converts an interface type into a struct
-type StructConverter interface {
-	Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec
-}
-
 // SpyStructConverter converts interfaces into spies, i.e., test doubles.
 // Meant to be used in conjunction with SpyFuncImplementer
 type SpyStructConverter struct{}

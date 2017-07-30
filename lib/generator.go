@@ -2,6 +2,17 @@ package fm
 
 import "go/ast"
 
+// StructConverter converts an interface type into a struct
+type StructConverter interface {
+	Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec
+}
+
+// FuncImplementer accepts an interface and returns implementations
+// of its functions
+type FuncImplementer interface {
+	Implement(name *ast.Ident, i *ast.InterfaceType) []*ast.FuncDecl
+}
+
 // SpyGenerator creates spy implementations of interface declarations
 type SpyGenerator struct {
 	Converter   StructConverter

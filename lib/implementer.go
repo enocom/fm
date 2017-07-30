@@ -10,12 +10,6 @@ const (
 	recvName = "f"
 )
 
-// FuncImplementer accepts an interface and returns implementations
-// of its functions
-type FuncImplementer interface {
-	Implement(name *ast.Ident, i *ast.InterfaceType) []*ast.FuncDecl
-}
-
 // SpyFuncImplementer creates spy implementations of an interface's functions.
 // Meant to be used in conjunction with SpyStructConverter
 type SpyFuncImplementer struct{}
