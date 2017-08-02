@@ -27,7 +27,10 @@ func TestRunWritesToFile(t *testing.T) {
 		Writer:        &fm.FileWriter{},
 		ImportWriter:  &fm.GoImportsWriter{},
 	}
-	cmd.Run(wd, "sample_test.go")
+	err = cmd.Run(wd, "sample_test.go")
+	if err != nil {
+		t.Fatalf("Run failed with error %v", err)
+	}
 
 	f, err := os.Open(path.Join(wd, "sample_test.go"))
 	if err != nil {
@@ -122,7 +125,10 @@ func TestRunAddsGoSuffix(t *testing.T) {
 		ImportWriter:  &SpyImportWriter{},
 	}
 
-	cmd.Run("", "sample_test")
+	err := cmd.Run("", "sample_test")
+	if err != nil {
+		t.Fatalf("Run failed with error %v", err)
+	}
 
 	want := "sample_test.go"
 	got := spyFileWriter.Write_Input.Arg1
@@ -137,10 +143,12 @@ func writeTmpFile(code string) (string, error, func()) {
 	if err != nil {
 		return "", err, func() {}
 	}
-	rmDir := func() { os.Remove(dir) }
+	rmDir := func() { _ = os.Remove(dir) }
 
 	f, err := os.Create(path.Join(dir, "sample.go"))
-	defer f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 	if err != nil {
 		return "", err, rmDir
 	}

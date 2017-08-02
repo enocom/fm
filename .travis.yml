@@ -3,6 +3,7 @@ sudo: false
 go:
   - master
 install:
+  - go get golang.org/x/tools/cmd/goimports
   - go get -v github.com/golang/lint/golint
   - go build -v ./...
 script:
