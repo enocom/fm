@@ -25,7 +25,7 @@ func TestConvertBuildsAddsSpyToTypeSpecName(t *testing.T) {
 	}
 }
 
-func TestConvertAddsRecordOfFunctionCallAsField(t *testing.T) {
+func TestConvertAddsMutexWithRecordOfFunctionCallAsFields(t *testing.T) {
 	converter := &fm.SpyStructConverter{}
 
 	typeSpec := converter.Convert(
@@ -50,10 +50,16 @@ func TestConvertAddsRecordOfFunctionCallAsField(t *testing.T) {
 		t.Fatal("expected typeSpec to be of type StructType")
 	}
 
-	calledField := structType.Fields.List[0]
+	mutexField := structType.Fields.List[0]
+	want := "mu"
+	got := mutexField.Names[0].Name
+	if want != got {
+		t.Errorf("want %v, got %v", want, got)
+	}
 
-	want := "Test_Called"
-	got := calledField.Names[0].Name
+	calledField := structType.Fields.List[1]
+	want = "Test_Called"
+	got = calledField.Names[0].Name
 	if want != got {
 		t.Errorf("want %v, got %v", want, got)
 	}
@@ -86,7 +92,7 @@ func TestConvertGeneratesInputStructFieldWithArguments(t *testing.T) {
 		t.Fatal("expected typeSpec to be of type StructType")
 	}
 
-	want := 1
+	want := 2
 	got := len(structType.Fields.List)
 	if want != got {
 		t.Errorf("want %v, got %v", want, got)
@@ -126,14 +132,14 @@ func TestConvertGeneratesInputStructWithArgumentFields(t *testing.T) {
 		t.Fatal("expected typeSpec to be of type StructType")
 	}
 
-	want := 2 // Test_Called and Test_Input
+	want := 3 // mu, Test_Called, and Test_Input
 	got := len(structType.Fields.List)
 
 	if want != got {
 		t.Errorf("want %v, got %v", want, got)
 	}
 
-	inputStruct := structType.Fields.List[1]
+	inputStruct := structType.Fields.List[2]
 
 	wantName := "Test_Input"
 	gotName := inputStruct.Names[0].Name
@@ -207,7 +213,7 @@ func TestConvertHandlesArgumentsDeclaredWithOneType(t *testing.T) {
 	if !ok {
 		t.Fatal("expected typeSpec to be of type StructType")
 	}
-	inputStruct := structType.Fields.List[1]
+	inputStruct := structType.Fields.List[2]
 	input, ok := inputStruct.Type.(*ast.StructType)
 	if !ok {
 		t.Fatal("expected inputStruct to be of type StructType")
@@ -283,14 +289,14 @@ func TestConvertGeneratesOutputStruct(t *testing.T) {
 		t.Fatal("expected typeSpec to be of type StructType")
 	}
 
-	want := 2 // Test_Called and Test_Output
+	want := 3 // mu, Test_Called, and Test_Output
 	got := len(structType.Fields.List)
 
 	if want != got {
 		t.Errorf("want %v, got %v", want, got)
 	}
 
-	outputStruct := structType.Fields.List[1]
+	outputStruct := structType.Fields.List[2]
 
 	wantName := "Test_Output"
 	gotName := outputStruct.Names[0].Name
@@ -356,7 +362,7 @@ func TestConvertIgnoresEmptyReturnValues(t *testing.T) {
 		t.Fatal("expected typeSpec to be of type StructType")
 	}
 
-	want := 1
+	want := 2 // mu and Test_Called
 	got := len(structType.Fields.List)
 	if want != got {
 		t.Errorf("want %v, got %v", want, got)

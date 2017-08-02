@@ -25,6 +25,7 @@ func TestRunWritesToFile(t *testing.T) {
 		DeclGenerator: buildGen(),
 		Parser:        &fm.SrcFileParser{},
 		Writer:        &fm.FileWriter{},
+		ImportWriter:  &fm.GoImportsWriter{},
 	}
 	cmd.Run(wd, "sample_test.go")
 
@@ -57,6 +58,7 @@ func TestRunReturnsErrorWhenParseFails(t *testing.T) {
 		Parser:        spyParser,
 		DeclGenerator: nil,
 		Writer:        nil,
+		ImportWriter:  nil,
 	}
 
 	err := cmd.Run("", "sample_test.go")
@@ -80,7 +82,7 @@ func TestRunReturnsErrorWhenWriteFails(t *testing.T) {
 		},
 	}
 	spyParser.ParseDir_Output.Ret1 = nil
-	spyFileWriter := &SpyFileWriter{}
+	spyFileWriter := &SpyWriter{}
 	expectedError := errors.New("write failed")
 	spyFileWriter.Write_Output.Ret0 = expectedError
 
@@ -88,6 +90,7 @@ func TestRunReturnsErrorWhenWriteFails(t *testing.T) {
 		Parser:        spyParser,
 		DeclGenerator: nil,
 		Writer:        spyFileWriter,
+		ImportWriter:  nil,
 	}
 
 	err := cmd.Run("", "sample_test.go")
@@ -110,12 +113,13 @@ func TestRunAddsGoSuffix(t *testing.T) {
 		},
 	}
 	spyParser.ParseDir_Output.Ret1 = nil
-	spyFileWriter := &SpyFileWriter{}
+	spyFileWriter := &SpyWriter{}
 
 	cmd := &fm.Cmd{
 		Parser:        spyParser,
 		DeclGenerator: nil,
 		Writer:        spyFileWriter,
+		ImportWriter:  &SpyImportWriter{},
 	}
 
 	cmd.Run("", "sample_test")

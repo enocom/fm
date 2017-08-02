@@ -11,5 +11,3 @@ Writing a spy generator is the "Hello, World!" of AST parsing and generating in 
 ## TODO
 
 - support embedded interfaces
-- update import paths when necessary
-- Wrap fields in mutex for thread-safety

@@ -45,6 +45,34 @@ func (s *SpyFuncImplementer) Implement(name *ast.Ident, i *ast.InterfaceType) []
 func createBlockStmt(fname string, f *ast.FuncType) *ast.BlockStmt {
 	var list []ast.Stmt
 
+	// x.mu.Lock()
+	lockStmt := &ast.ExprStmt{
+		X: &ast.CallExpr{
+			Fun: &ast.SelectorExpr{
+				X: &ast.SelectorExpr{
+					X:   ast.NewIdent(recvName),
+					Sel: ast.NewIdent("mu"),
+				},
+				Sel: ast.NewIdent("Lock"),
+			},
+		},
+	}
+	list = append(list, lockStmt)
+
+	// defer x.mu.Unlock()
+	deferStmt := &ast.DeferStmt{
+		Call: &ast.CallExpr{
+			Fun: &ast.SelectorExpr{
+				X: &ast.SelectorExpr{
+					X:   ast.NewIdent(recvName),
+					Sel: ast.NewIdent("mu"),
+				},
+				Sel: ast.NewIdent("Unlock"),
+			},
+		},
+	}
+	list = append(list, deferStmt)
+
 	// add called assignment statement
 	calledStmt := &ast.AssignStmt{
 		Lhs: []ast.Expr{

@@ -2,7 +2,10 @@
 // Regenerate by running fm instead.
 package example_test
 
+import "sync"
+
 type SpyDoer struct {
+	mu          sync.Mutex
 	DoIt_Called bool
 	DoIt_Input  struct {
 		Arg0 string
@@ -15,6 +18,8 @@ type SpyDoer struct {
 }
 
 func (f *SpyDoer) DoIt(task string, graciously bool) (int, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	f.DoIt_Called = true
 	f.DoIt_Input.Arg0 = task
 	f.DoIt_Input.Arg1 = graciously
@@ -22,6 +27,7 @@ func (f *SpyDoer) DoIt(task string, graciously bool) (int, error) {
 }
 
 type SpyRepeater struct {
+	mu            sync.Mutex
 	Repeat_Called bool
 	Repeat_Input  struct {
 		Arg0 string
@@ -34,6 +40,8 @@ type SpyRepeater struct {
 }
 
 func (f *SpyRepeater) Repeat(task, rationale string) (count int, err error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
 	f.Repeat_Called = true
 	f.Repeat_Input.Arg0 = task
 	f.Repeat_Input.Arg1 = rationale

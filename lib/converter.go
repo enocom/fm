@@ -17,6 +17,14 @@ type SpyStructConverter struct{}
 // for all parameters and all return values declared in the interface
 func (s *SpyStructConverter) Convert(t *ast.TypeSpec, i *ast.InterfaceType) *ast.TypeSpec {
 	var list []*ast.Field
+	list = append(list, &ast.Field{
+		Names: []*ast.Ident{ast.NewIdent("mu")},
+		Type: &ast.SelectorExpr{
+			X:   ast.NewIdent("sync"),
+			Sel: ast.NewIdent("Mutex"),
+		},
+	})
+
 	for _, field := range i.Methods.List {
 		funcType, ok := field.Type.(*ast.FuncType)
 		if !ok {

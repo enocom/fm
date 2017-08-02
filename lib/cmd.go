@@ -29,6 +29,12 @@ type Writer interface {
 	Write(file *ast.File, filename string) error
 }
 
+// ImportWriter runs goimport against the specified file, writing the results
+// back out to the same file
+type ImportWriter interface {
+	Write(filename string) error
+}
+
 // Cmd coordinates between a parser, a generator, and a file writer.
 // It passes a parsed AST to the generator which produces an AST of spies
 // from the original AST, and then passes the generated AST to the file
@@ -37,6 +43,7 @@ type Cmd struct {
 	DeclGenerator
 	Parser
 	Writer
+	ImportWriter
 }
 
 // Run parses the AST within the working directory and passes it to
@@ -63,7 +70,14 @@ func (c *Cmd) Run(directory, outputFilename string) error {
 		if !strings.HasSuffix(outputFilename, ".go") {
 			outputFilename += ".go"
 		}
-		err = c.Write(astFile, path.Join(directory, outputFilename))
+
+		filename := path.Join(directory, outputFilename)
+		err = c.Writer.Write(astFile, filename)
+		if err != nil {
+			return err
+		}
+
+		err = c.ImportWriter.Write(filename)
 		if err != nil {
 			return err
 		}
