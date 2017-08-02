@@ -9,7 +9,7 @@ import (
 )
 
 // Version designates the currently released version of fm
-const Version = "1.1.0"
+const Version = "1.2.0"
 
 func main() {
 	printVersion := flag.Bool("version", false, "Print version and exit")
